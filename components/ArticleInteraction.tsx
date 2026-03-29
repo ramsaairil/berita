@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition, useState } from "react";
-import { toggleLike } from "@/app/actions/interact";
+import { toggleLike, toggleBookmark } from "@/app/actions/interact";
 import { useRouter } from "next/navigation";
 import { ThumbsUp, MessageSquare, Link as LinkIcon, Bookmark } from "lucide-react";
 
@@ -9,16 +9,19 @@ export default function ArticleInteraction({
   articleId,
   initialLikes,
   initialIsLiked,
+  initialIsBookmarked,
   commentCount
 }: {
   articleId: string;
   initialLikes: number;
   initialIsLiked: boolean;
+  initialIsBookmarked: boolean;
   commentCount: number;
 }) {
   const [isPending, startTransition] = useTransition();
   const [likes, setLikes] = useState(initialLikes);
   const [isLiked, setIsLiked] = useState(initialIsLiked);
+  const [isBookmarked, setIsBookmarked] = useState(initialIsBookmarked);
   const router = useRouter();
 
   const handleLike = () => {
@@ -29,12 +32,25 @@ export default function ArticleInteraction({
     startTransition(async () => {
        const res = await toggleLike(articleId);
        if (res?.error) {
-          // Revert if failed (e.g., not logged in)
           setLikes(initialLikes);
           setIsLiked(initialIsLiked);
           alert(res.error);
           router.push("/login");
        }
+    });
+  };
+
+  const handleBookmark = () => {
+    // Optimistic Update
+    setIsBookmarked(!isBookmarked);
+
+    startTransition(async () => {
+      const res = await toggleBookmark(articleId);
+      if (res?.error) {
+        setIsBookmarked(initialIsBookmarked);
+        alert(res.error);
+        router.push("/login");
+      }
     });
   };
 
@@ -48,12 +64,28 @@ export default function ArticleInteraction({
             const el = document.getElementById("comments");
             el?.scrollIntoView({ behavior: "smooth" });
          }} className="hover:text-black flex items-center gap-2">
-            <MessageSquare className="w-5 h-5" /> {commentCount}
+            <MessageSquare className="w-5 h-5" strokeWidth={1.5} /> {commentCount}
          </button>
       </div>
       <div className="flex items-center gap-4 text-gray-500">
-         <button className="hover:text-black cursor-not-allowed" title="Segera hadir"><LinkIcon className="w-5 h-5" /></button>
-         <button className="hover:text-black cursor-not-allowed" title="Segera hadir"><Bookmark className="w-5 h-5" /></button>
+         <button 
+           onClick={() => {
+             navigator.clipboard.writeText(window.location.href);
+             alert("Tautan berhasil disalin!");
+           }}
+           className="hover:text-black p-2 rounded-full hover:bg-gray-50 transition-all" 
+           title="Salin Tautan"
+         >
+           <LinkIcon className="w-5 h-5" strokeWidth={1.5} />
+         </button>
+         <button 
+           onClick={handleBookmark} 
+           disabled={isPending}
+           className={`p-2 rounded-full hover:bg-gray-50 transition-all ${isBookmarked ? 'text-[#0d88b5]' : 'hover:text-black'}`}
+           title={isBookmarked ? "Hapus Simpanan" : "Simpan Berita"}
+         >
+           <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-[#0d88b5]' : ''}`} strokeWidth={1.5} />
+         </button>
       </div>
     </div>
   );

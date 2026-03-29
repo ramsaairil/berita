@@ -21,6 +21,11 @@ enum ArticleStatus {
   ARCHIVED
 }
 
+enum NotificationType {
+  LIKE_COMMENT
+  REPLY_COMMENT
+}
+
 // -----------------------------------------------------------------------------
 // MODELS
 // -----------------------------------------------------------------------------
@@ -40,6 +45,8 @@ model User {
   bookmarks     Bookmark[]
   likes         Like[]
   commentLikes  CommentLike[]
+  notifications      Notification[] @relation("UserNotifications")
+  triggeredNotifications Notification[] @relation("ActorNotifications")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -91,6 +98,7 @@ model Article {
   comments  Comment[]
   bookmarks Bookmark[]
   likes     Like[]
+  notifications Notification[]
 
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
@@ -117,6 +125,7 @@ model Comment {
   replies  Comment[] @relation("CommentReplies")
 
   commentLikes CommentLike[]
+  notifications Notification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -175,4 +184,26 @@ model CommentLike {
   @@unique([userId, commentId])
   @@index([userId])
   @@index([commentId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  read      Boolean          @default(false)
+  
+  userId    String 
+  actorId   String 
+  
+  articleId String?
+  commentId String?
+  
+  createdAt DateTime @default(now())
+
+  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actor     User     @relation("ActorNotifications", fields: [actorId], references: [id], onDelete: Cascade)
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([actorId])
 }

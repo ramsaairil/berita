@@ -41,7 +41,7 @@ export default function ArticleList({ articles }: { articles: ArticleWithRelatio
               <span className="text-gray-400 text-[13px]">·</span>
               <span className="text-[13px] font-medium text-gray-500">{article.category.name}</span>
             </div>
-            
+
             <Link href={`/berita/${article.slug}`} className="block mb-2">
               <h2 className="text-[18px] sm:text-[20px] font-bold leading-snug group-hover:text-[#0d88b5] transition-colors duration-200 text-[#1a1a1a]">
                 {article.title}
@@ -56,14 +56,13 @@ export default function ArticleList({ articles }: { articles: ArticleWithRelatio
               <span>
                 {article.publishedAt
                   ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric"
-                    })
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                  })
                   : "Draft"}
               </span>
-              <span>·</span>
-              <span>3 min read</span>
+
             </div>
           </div>
         </article>

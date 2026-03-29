@@ -18,8 +18,8 @@ export default async function Home() {
   const categories = await getPopularCategories();
 
   return (
-    <div className="flex bg-[#ebf5fa] font-sans text-black min-h-screen">
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-10 flex gap-12">
+    <div className="bg-[#ebf5fa] font-sans text-black min-h-screen">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col lg:flex-row gap-12">
         {/* Main Content Area */}
         <div className="w-full lg:w-[65%]">
           <div className="flex flex-col gap-6">

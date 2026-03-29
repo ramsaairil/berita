@@ -22,6 +22,7 @@ export default async function ArticlePage({
       category: true,
       tags: true,
       likes: true,
+      bookmarks: true,
       _count: {
         select: { comments: true }
       },
@@ -42,6 +43,7 @@ export default async function ArticlePage({
   const session = await getSession();
   const isLoggedIn = !!session;
   const isLikedByMe = session ? article.likes.some(like => like.userId === session.user.id) : false;
+  const isBookmarkedByMe = session ? article.bookmarks.some(b => b.userId === session.user.id) : false;
 
   // Fetch Recommended Articles (same category, exclude current)
   const relatedArticles = await prisma.article.findMany({
@@ -63,29 +65,27 @@ export default async function ArticlePage({
   const categories = await getPopularCategories();
 
   return (
-    <div className="flex bg-white font-sans text-black min-h-screen">
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-12 flex gap-12">
+    <div className="bg-white font-sans text-black min-h-screen">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col lg:flex-row gap-12">
         {/* Main Content Area: Left Block */}
         <div className="w-full lg:w-[65%]">
-          <article className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm">
-            <h1 className="text-[32px] sm:text-[40px] font-bold leading-[1.2] tracking-tight mb-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-10 border border-gray-100 shadow-sm">
+            <h1 className="text-[28px] sm:text-[40px] font-bold leading-[1.3] tracking-tight mb-6 sm:mb-8">
               {article.title}
             </h1>
 
             {/* Author & Meta */}
-            <div className="flex items-center gap-4 mb-8 border-b border-gray-100 pb-8">
+            <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 border-b border-gray-100 pb-6 sm:pb-8">
               <img
                 src={article.author.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${article.author.name}`}
                 alt={article.author.name || "Author"}
-                className="w-12 h-12 rounded-full object-cover border border-gray-100 shrink-0"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-100 shrink-0"
               />
               <div className="flex flex-col">
-                <span className="text-[16px] font-medium text-black">
+                <span className="text-[15px] sm:text-[16px] font-medium text-black">
                   {article.author.name}
                 </span>
-                <div className="flex items-center gap-2 text-[14px] text-gray-500 mt-0.5">
-                  <span>3 min read</span>
-                  <span>·</span>
+                <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-gray-500 mt-0.5">
                   <span>
                     {article.publishedAt
                       ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
@@ -103,26 +103,27 @@ export default async function ArticlePage({
               articleId={article.id}
               initialLikes={article.likes.length}
               initialIsLiked={isLikedByMe}
+              initialIsBookmarked={isBookmarkedByMe}
               commentCount={article._count.comments}
             />
 
             {article.featuredImg && (
-              <div className="mb-12 flex justify-center">
+              <div className="my-8 sm:my-12 flex justify-center">
                 <Image
                   src={article.featuredImg}
                   width={800}
                   height={450}
                   alt={article.title}
-                  className="w-full max-w-[550px] max-h-[350px] object-cover rounded-xl"
+                  className="w-full max-h-[400px] object-cover rounded-xl"
                 />
               </div>
             )}
 
-            <div className="prose prose-lg max-w-none prose-p:leading-8 prose-p:text-[20px] prose-p:text-[#242424] prose-a:text-black">
+            <div className="prose prose-lg max-w-none prose-p:leading-8 prose-p:text-[18px] sm:prose-p:text-[20px] prose-p:text-[#242424] prose-a:text-black">
               <p className="whitespace-pre-wrap">{article.content}</p>
             </div>
 
-            <div className="mt-12 flex items-center gap-2 flex-wrap pb-10">
+            <div className="mt-8 sm:mt-12 flex items-center gap-2 flex-wrap pb-10">
               {article.tags.map(tag => (
                 <Link key={tag.id} href={`/`} className="bg-gray-100 hover:bg-gray-200 transition-colors text-black px-4 py-2 rounded-full text-[14px]">
                   {tag.name}
@@ -159,7 +160,7 @@ export default async function ArticlePage({
                         <div className="flex-1">
                           <h4 className="font-bold text-[14px] leading-snug group-hover:text-[#0d88b5] transition-colors duration-200 line-clamp-3 text-[#1a1a1a]">{rel.title}</h4>
                           <div className="flex items-center gap-1.5 text-[11px] text-gray-400 mt-2 font-medium">
-                             <span>{rel.publishedAt ? new Date(rel.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "Baru saja"}</span>
+                            <span>{rel.publishedAt ? new Date(rel.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "Baru saja"}</span>
                           </div>
                         </div>
                       </div>

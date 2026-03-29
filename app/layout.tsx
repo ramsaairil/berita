@@ -4,8 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { getSession } from "@/lib/session";
 import prisma from "@/lib/prisma";
-
 import Footer from "@/components/Footer";
+import { getPopularCategories } from "@/lib/categories";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,10 +34,12 @@ export default async function RootLayout({
     dbUser = await prisma.user.findUnique({ where: { id: session.user.id } });
   }
 
+  const categories = await getPopularCategories();
+
   return (
     <html lang="id">
       <body className="antialiased min-h-screen flex flex-col relative overflow-x-hidden">
-        <Navbar user={dbUser} />
+        <Navbar user={dbUser} categories={categories as any} />
         <div className="flex-1 basis-auto">
           {children}
         </div>

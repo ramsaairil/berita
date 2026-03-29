@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useTransition, useMemo } from "react";
-import { addComment, toggleCommentLike } from "@/app/actions/interact";
+import { addComment, toggleCommentLike, deleteComment } from "@/app/actions/interact";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ThumbsUp } from "lucide-react";
+import { ThumbsUp, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 type CommentType = {
@@ -62,12 +62,10 @@ export default function CommentSection({
       }
     });
 
-    // Helper to flatten a tree node into a flat array of all its descendants
     const flattenDescendants = (node: CommentType, rootId: string): FlatRepliedComment[] => {
       let flat: FlatRepliedComment[] = [];
       if (!node.replies) return flat;
       
-      // Sort immediate children chronologically
       node.replies.sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
       
       for (const child of node.replies) {
@@ -84,7 +82,6 @@ export default function CommentSection({
 
     const finalRoots = roots.map(root => {
        const flatReplies = flattenDescendants(root, root.id);
-       // Sort all descendants chronologically across the entire thread
        flatReplies.sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
        
        return {
@@ -93,7 +90,6 @@ export default function CommentSection({
        } as FlatRepliedComment;
     });
 
-    // Sort roots descending (newest root first)
     finalRoots.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return finalRoots;
@@ -114,19 +110,16 @@ export default function CommentSection({
     });
   };
 
-  // 1-Level Indentation Component
   const SingleComment = ({ c, isRoot = true }: { c: FlatRepliedComment, isRoot?: boolean }) => {
     const [isReplying, setIsReplying] = useState(false);
     const [replyContent, setReplyContent] = useState("");
     const [isActionPending, startAction] = useTransition();
     
-    // Optimistic Like State
     const initialIsLiked = currentUserId ? c.commentLikes.some(like => like.userId === currentUserId) : false;
     const initialLikeCount = c.commentLikes.length;
     const [isLiked, setIsLiked] = useState(initialIsLiked);
     const [likeCount, setLikeCount] = useState(initialLikeCount);
 
-    // Paginasi Balasan
     const [visibleRepliesCount, setVisibleRepliesCount] = useState(2);
     const visibleReplies = c.replies ? c.replies.slice(0, visibleRepliesCount) : [];
     const hasMoreReplies = c.replies && c.replies.length > visibleRepliesCount;
@@ -142,7 +135,6 @@ export default function CommentSection({
          } else {
            setIsReplying(false);
            setReplyContent("");
-           // Otomatis buka semua balasan ketika kita baru saja membalas
            if (c.replies) setVisibleRepliesCount(c.replies.length + 1);
          }
       });
@@ -164,6 +156,17 @@ export default function CommentSection({
             setLikeCount(initialLikeCount);
          }
       });
+    };
+
+    const handleDelete = () => {
+      if (confirm("Apakah Anda yakin ingin menghapus komentar ini?")) {
+        startAction(async () => {
+          const res = await deleteComment(c.id);
+          if (res?.error) {
+            alert(res.error);
+          }
+        });
+      }
     };
 
     return (
@@ -206,7 +209,16 @@ export default function CommentSection({
               }} className="hover:text-black">
                  Balas
               </button>
-              
+
+              {isLoggedIn && currentUserId === c.author.id && (
+                <button 
+                  onClick={handleDelete}
+                  disabled={isActionPending}
+                  className="text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" /> Hapus
+                </button>
+              )}
            </div>
 
            {isReplying && (
@@ -229,7 +241,6 @@ export default function CommentSection({
              </form>
            )}
 
-           {/* Render flat Replies array only if this is Root */}
            {isRoot && c.replies && c.replies.length > 0 && (
              <div className="mt-4 space-y-6">
                 {visibleReplies.map(reply => (
