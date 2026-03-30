@@ -63,7 +63,7 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
           
           <Link href="/" className="flex items-center group shrink-0">
             <span className="font-serif text-[24px] sm:text-[32px] font-bold tracking-tighter text-black group-hover:text-gray-800 transition-all duration-300">
-              Berita.
+              Berita
             </span>
           </Link>
           <div className="hidden lg:block ml-4 flex-1 max-w-xs">
