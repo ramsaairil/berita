@@ -23,114 +23,126 @@ export default async function ArticlePage({
       tags: true,
       likes: true,
       bookmarks: true,
-      _count: {
-        select: { comments: true }
-      },
+      _count: { select: { comments: true } },
       comments: {
-        include: {
-          author: true,
-          commentLikes: true,
-        },
+        include: { author: true, commentLikes: true },
         orderBy: { createdAt: "asc" }
       }
     },
   });
 
-  if (!article) {
-    notFound();
-  }
+  if (!article) notFound();
 
   const session = await getSession();
   const isLoggedIn = !!session;
   const isLikedByMe = session ? article.likes.some(like => like.userId === session.user.id) : false;
   const isBookmarkedByMe = session ? article.bookmarks.some(b => b.userId === session.user.id) : false;
 
-  // Fetch Recommended Articles (same category, exclude current)
   const relatedArticles = await prisma.article.findMany({
-    where: {
-      categoryId: article.categoryId,
-      id: { not: article.id }
-    },
+    where: { categoryId: article.categoryId, id: { not: article.id } },
     take: 3,
-    include: {
-      author: true,
-      category: true,
-    },
-    orderBy: {
-      createdAt: "desc"
-    }
+    include: { author: true, category: true },
+    orderBy: { createdAt: "desc" }
   });
 
-  // Fetch all categories for the Sidebar
   const categories = await getPopularCategories();
 
   return (
     <div className="bg-white font-sans text-black min-h-screen">
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col lg:flex-row gap-12">
-        {/* Main Content Area: Left Block */}
+        {/* Main Content Area */}
         <div className="w-full lg:w-[65%]">
-          <article className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-10 border border-gray-100 shadow-sm">
-            <h1 className="text-[28px] sm:text-[40px] font-bold leading-[1.3] tracking-tight mb-6 sm:mb-8">
-              {article.title}
-            </h1>
-
-            {/* Author & Meta */}
-            <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 border-b border-gray-100 pb-6 sm:pb-8">
-              <img
-                src={article.author.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${article.author.name}`}
-                alt={article.author.name || "Author"}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-100 shrink-0"
-              />
-              <div className="flex flex-col">
-                <span className="text-[15px] sm:text-[16px] font-medium text-black">
-                  {article.author.name}
-                </span>
-                <div className="flex items-center gap-2 text-[13px] sm:text-[14px] text-gray-500 mt-0.5">
-                  <span>
-                    {article.publishedAt
-                      ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })
-                      : "Baru saja"}
-                  </span>
+          <article className="bg-white">
+            
+            {/* Editorial Header */}
+            <header className="mb-8">
+              <div className="mb-4">
+                <Link href={`/category/${article.category.slug}`} className="text-blue-600 font-bold uppercase tracking-widest text-sm hover:text-blue-800 transition-colors">
+                  {article.category.name}
+                </Link>
+              </div>
+              <h1 className="text-[32px] sm:text-[46px] font-extrabold leading-[1.2] tracking-tight mb-6 text-[#121212]">
+                {article.title}
+              </h1>
+              
+              <div className="flex items-center justify-between border-b border-gray-100 pb-6 mb-6">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={article.author.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${article.author.name}`}
+                    alt={article.author.name || "Author"}
+                    className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                  />
+                  <div>
+                    <div className="font-bold text-[16px] text-gray-900">{article.author.name}</div>
+                    <div className="text-[14px] text-gray-500 font-medium">
+                      {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "Baru saja"}
+                      <span className="mx-2">·</span> 5 min read
+                    </div>
+                  </div>
                 </div>
               </div>
+            </header>
+
+            {/* Bleed Image */}
+            {article.featuredImg && (
+              <figure className="mb-10 sm:mb-14">
+                <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden bg-gray-50 shadow-sm">
+                  <Image
+                    src={article.featuredImg}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 65vw"
+                    alt={article.title}
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                <figcaption className="text-center text-gray-400 text-sm mt-3 font-serif italic">
+                  Ilustrasi liputan terkait {article.category.name.toLowerCase()}
+                </figcaption>
+              </figure>
+            )}
+
+            {/* Interaction Bar (Top) */}
+            <div className="mb-10">
+              <ArticleInteraction
+                articleId={article.id}
+                initialLikes={article.likes.length}
+                initialIsLiked={isLikedByMe}
+                initialIsBookmarked={isBookmarkedByMe}
+                commentCount={article._count.comments}
+              />
             </div>
 
-            <ArticleInteraction
-              articleId={article.id}
-              initialLikes={article.likes.length}
-              initialIsLiked={isLikedByMe}
-              initialIsBookmarked={isBookmarkedByMe}
-              commentCount={article._count.comments}
-            />
+            {/* Typography Content Body */}
+            <div className="prose prose-xl prose-stone max-w-none prose-p:leading-relaxed prose-p:text-[#242424] prose-a:text-blue-600 prose-a:decoration-blue-300 hover:prose-a:decoration-blue-600 prose-headings:font-bold prose-headings:tracking-tight mb-16 font-serif">
+              {/* Fallback rendering of HTML content if string contains HTML tags, otherwise pre-wrap */}
+              <div dangerouslySetInnerHTML={{ __html: article.content }} />
+            </div>
 
-            {article.featuredImg && (
-              <div className="my-8 sm:my-12 flex justify-center">
-                <Image
-                  src={article.featuredImg}
-                  width={800}
-                  height={450}
-                  alt={article.title}
-                  className="w-full max-h-[400px] object-cover rounded-xl"
-                />
+            {/* Tags Area */}
+            {article.tags.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap border-t border-gray-100 pt-8 mb-12">
+                <span className="text-gray-500 font-bold mr-2 text-sm uppercase tracking-widest">TAGS:</span>
+                {article.tags.map(tag => (
+                  <Link key={tag.id} href={`/`} className="bg-gray-50 hover:bg-gray-200 transition-colors text-gray-700 px-4 py-1.5 rounded-full text-[13px] font-medium border border-gray-200">
+                    {tag.name}
+                  </Link>
+                ))}
               </div>
             )}
 
-            <div className="prose prose-lg max-w-none prose-p:leading-8 prose-p:text-[18px] sm:prose-p:text-[20px] prose-p:text-[#242424] prose-a:text-black">
-              <p className="whitespace-pre-wrap">{article.content}</p>
+            {/* Interaction Bar (Bottom) */}
+            <div className="border-y border-gray-100 py-6 mb-12">
+              <ArticleInteraction
+                articleId={article.id}
+                initialLikes={article.likes.length}
+                initialIsLiked={isLikedByMe}
+                initialIsBookmarked={isBookmarkedByMe}
+                commentCount={article._count.comments}
+              />
             </div>
 
-            <div className="mt-8 sm:mt-12 flex items-center gap-2 flex-wrap pb-10">
-              {article.tags.map(tag => (
-                <Link key={tag.id} href={`/`} className="bg-gray-100 hover:bg-gray-200 transition-colors text-black px-4 py-2 rounded-full text-[14px]">
-                  {tag.name}
-                </Link>
-              ))}
-            </div>
-
+            {/* Comments */}
             <CommentSection
               articleId={article.id}
               comments={article.comments as any}
@@ -141,50 +153,8 @@ export default async function ArticlePage({
           </article>
         </div>
 
-        {/* Right Block: Rekomendasi Berita & Kategori */}
-        <div className="hidden lg:block lg:w-[35%] pl-8">
-          <div className="sticky top-24 flex flex-col gap-6">
-            {/* Related Articles Box */}
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-[16px] mb-6">Rekomendasi Berita</h3>
-              {relatedArticles.length > 0 ? (
-                <div className="flex flex-col gap-6">
-                  {relatedArticles.map(rel => (
-                    <Link href={`/berita/${rel.slug}`} key={rel.id} className="group block">
-                      <div className="flex gap-4 items-center">
-                        {rel.featuredImg && (
-                          <div className="shrink-0 w-[80px] h-[80px] relative rounded-xl overflow-hidden">
-                            <Image src={rel.featuredImg} fill sizes="80px" alt={rel.title} className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <h4 className="font-bold text-[14px] leading-snug group-hover:text-[#0d88b5] transition-colors duration-200 line-clamp-3 text-[#1a1a1a]">{rel.title}</h4>
-                          <div className="flex items-center gap-1.5 text-[11px] text-gray-400 mt-2 font-medium">
-                            <span>{rel.publishedAt ? new Date(rel.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "Baru saja"}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-sm">Belum ada berita terkait.</p>
-              )}
-            </div>
-
-            {/* Sidebar Kategori Inline */}
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm">
-              <h2 className="text-[16px] font-bold mb-6">Kategori Populer</h2>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => (
-                  <Link key={cat.id} href={`/category/${cat.slug}`} className="bg-gray-50 hover:bg-gray-100 transition-colors text-black px-4 py-2 rounded-full text-[14px] border border-gray-100">
-                    {cat.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Universal Sidebar */}
+        <Sidebar categories={categories} />
       </main>
     </div>
   );

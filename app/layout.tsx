@@ -38,12 +38,12 @@ export default async function RootLayout({
 
   return (
     <html lang="id">
-      <body className="antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+      <body className="antialiased min-h-screen flex flex-col relative">
         <Navbar user={dbUser} categories={categories as any} />
-        <div className="flex-1 basis-auto">
+        <main id="main-content" className="flex flex-col flex-1 basis-auto w-full transition-all duration-300">
           {children}
-        </div>
-        <Footer />
+          <Footer />
+        </main>
       </body>
     </html>
   );
