@@ -131,16 +131,7 @@ export default async function ArticlePage({
               </div>
             )}
 
-            {/* Interaction Bar (Bottom) */}
-            <div className="border-y border-gray-100 py-6 mb-12">
-              <ArticleInteraction
-                articleId={article.id}
-                initialLikes={article.likes.length}
-                initialIsLiked={isLikedByMe}
-                initialIsBookmarked={isBookmarkedByMe}
-                commentCount={article._count.comments}
-              />
-            </div>
+
 
             {/* Comments */}
             <CommentSection
