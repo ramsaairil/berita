@@ -4,7 +4,7 @@ import { useState, useTransition, useMemo } from "react";
 import { addComment, toggleCommentLike, deleteComment } from "@/app/actions/interact";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ThumbsUp, Trash2 } from "lucide-react";
+import { ThumbsUp, Trash2, CornerDownRight } from "lucide-react";
 import Image from "next/image";
 
 type CommentType = {
@@ -181,8 +181,9 @@ export default function CommentSection({
              <h4 className="font-bold text-[15px]">{c.author.name}</h4>
              
              {!isRoot && !c.isDirectReplyToRoot && c.replyToName && (
-               <span className="text-gray-500 text-[13px] flex items-center gap-1 font-medium bg-gray-50 px-2 py-0.5 rounded-md">
-                 ▶ {c.replyToName}
+               <span className="text-gray-500 text-[13px] flex items-center gap-1 font-medium hover:text-black transition-colors" style={{ marginLeft: '-2px' }}>
+                 <CornerDownRight className="w-3.5 h-3.5 text-gray-400" />
+                 {c.replyToName}
                </span>
              )}
 
