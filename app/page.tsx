@@ -1,9 +1,9 @@
-import Sidebar from "@/components/Sidebar";
-import Pagination from "@/components/Pagination";
+import Sidebar from "@/components/layout/Sidebar";
+import Pagination from "@/components/ui/Pagination";
 import prisma from "@/lib/prisma";
 import { getPopularCategories } from "@/lib/categories";
-import HeroArticle from "@/components/HeroArticle";
-import ArticleGrid from "@/components/ArticleGrid";
+import HeroSlider from "@/components/features/articles/HeroSlider";
+import ArticleGrid from "@/components/features/articles/ArticleGrid";
 
 export default async function Home(props: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -11,7 +11,7 @@ export default async function Home(props: {
   const searchParams = await props.searchParams;
   const page =
     typeof searchParams?.page === "string" ? parseInt(searchParams.page) : 1;
-  const limit = 7;
+  const limit = 9;
   const skip = (page - 1) * limit;
 
   const [articles, totalArticles] = await Promise.all([
@@ -27,17 +27,17 @@ export default async function Home(props: {
   const totalPages = Math.ceil(totalArticles / limit);
   const categories = await getPopularCategories();
 
-  // First article = hero, rest = grid
-  const heroArticle = articles[0];
-  const gridArticles = articles.slice(1);
+  // First 3 articles = slider, rest = grid
+  const sliderArticles = page === 1 ? articles.slice(0, 3) : [];
+  const gridArticles = page === 1 ? articles.slice(3) : articles;
 
   return (
     <div className="bg-white text-black min-h-screen">
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col lg:flex-row gap-12">
         {/* Main Content */}
         <div className="w-full lg:w-[65%]">
-          {/* Hero Article */}
-          {heroArticle && <HeroArticle article={heroArticle} />}
+          {/* Hero Slider */}
+          {sliderArticles.length > 0 && <HeroSlider articles={sliderArticles as any} />}
 
           {/* Section Divider */}
           {gridArticles.length > 0 && (

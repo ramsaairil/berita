@@ -4,8 +4,8 @@ import { Menu, Search, PenSquare, LogOut, User, Bookmark, X, Newspaper, Home } f
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 import { usePathname } from "next/navigation";
-import SearchBar from "@/components/SearchBar";
-import NotificationDropdown from "@/components/NotificationDropdown";
+import SearchBar from "@/components/ui/SearchBar";
+import NotificationDropdown from "@/components/ui/NotificationDropdown";
 import { useState, useEffect } from "react";
 
 export default function Navbar({ user, categories }: { user?: any, categories?: any[] }) {
@@ -27,13 +27,19 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
 
   useEffect(() => {
     const mainContent = document.getElementById("main-content");
-    if (mainContent) {
+    const categoryBar = document.getElementById("category-bar");
+
+    const updatePadding = (el: HTMLElement | null) => {
+      if (!el) return;
       if (isSidebarOpen && !isMobile) {
-        mainContent.style.paddingLeft = "280px";
+        el.style.paddingLeft = "280px";
       } else {
-        mainContent.style.paddingLeft = "0px";
+        el.style.paddingLeft = "0px";
       }
-    }
+    };
+
+    updatePadding(mainContent);
+    updatePadding(categoryBar);
 
     if (isSidebarOpen && isMobile) {
       document.body.style.overflow = "hidden";
@@ -43,6 +49,7 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
 
     return () => {
       if (mainContent) mainContent.style.paddingLeft = "0px";
+      if (categoryBar) categoryBar.style.paddingLeft = "0px";
       document.body.style.overflow = "unset";
     };
   }, [isSidebarOpen, isMobile]);
@@ -82,13 +89,14 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
                 <Menu className="w-6 h-6 text-gray-700" strokeWidth={1.5} />
               )}
             </button>
-            <Link href="/" className="flex items-center shrink-0 group">
-              <span className="font-serif text-[22px] sm:text-[26px] font-bold tracking-tight text-black group-hover:opacity-80 transition-opacity leading-none">
-                <span className="font-normal text-gray-500">Portal</span>
-                <span className="text-black"> Berita</span>
-              </span>
+            <Link href="/" className="flex items-center shrink-0 group hover:opacity-80 transition-opacity">
+              <img
+                src="/logo.png"
+                alt="Portal Berita Logo"
+                className="h-[90px] sm:h-[120px] w-auto max-w-none object-contain -my-10 -ml-2 sm:-ml-5"
+              />
             </Link>
-            <div className="hidden md:block ml-4 w-64">
+            <div className="hidden md:block -ml-4 sm:-ml-8 w-64 lg:w-72">
               <SearchBar />
             </div>
           </div>

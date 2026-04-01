@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
-import ArticleList from "@/components/ArticleList";
-import Sidebar from "@/components/Sidebar";
+import ArticleList from "@/components/features/articles/ArticleList";
+import Sidebar from "@/components/layout/Sidebar";
 import { notFound } from "next/navigation";
 import { getPopularCategories } from "@/lib/categories";
 import { getCategoryColor } from "@/lib/categoryColors";

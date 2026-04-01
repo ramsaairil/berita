@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle, Eye, PenSquare, Calendar } from "lucide-react";
-import DeleteArticleButton from "@/components/DeleteArticleButton";
+import DeleteArticleButton from "@/components/ui/DeleteArticleButton";
 
 export default async function MyArticlesPage() {
   const session = await getSession();

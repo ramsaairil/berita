@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/session";
 import prisma from "@/lib/prisma";
-import ArticleList from "@/components/ArticleList";
+import ArticleList from "@/components/features/articles/ArticleList";
 import { redirect } from "next/navigation";
 
 export default async function BookmarksPage() {

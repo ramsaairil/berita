@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/layout/Sidebar";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import ArticleInteraction from "@/components/ArticleInteraction";
-import CommentSection from "@/components/CommentSection";
+import ArticleInteraction from "@/components/features/articles/ArticleInteraction";
+import CommentSection from "@/components/features/articles/CommentSection";
 import { getPopularCategories } from "@/lib/categories";
 import { getCategoryColor } from "@/lib/categoryColors";
 
@@ -54,11 +54,11 @@ export default async function ArticlePage({
   return (
     <div className="bg-white font-sans min-h-screen">
       <main className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 py-12 lg:py-16 flex flex-col lg:flex-row gap-16 lg:gap-20">
-        
+
         {/* Minimalist Centered Article Container */}
         <div className="w-full lg:w-[65%] xl:w-[70%]">
           <article className="max-w-[720px] mx-auto">
-            
+
             {/* Header & Meta */}
             <header className="mb-10 text-left">
               <div className="mb-6">
@@ -70,7 +70,7 @@ export default async function ArticlePage({
                   {article.category.name}
                 </Link>
               </div>
-              
+
               <h1 className="text-[34px] sm:text-[42px] lg:text-[48px] font-bold leading-[1.15] tracking-tight mb-8 text-[#111] font-serif">
                 {article.title}
               </h1>

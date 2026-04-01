@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import ArticleImageUpload from "@/components/ArticleImageUpload";
+import ArticleImageUpload from "@/components/features/articles/ArticleImageUpload";
 
 export default async function WritePage() {
   const categories = await prisma.category.findMany();

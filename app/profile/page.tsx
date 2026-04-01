@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import ProfileForm from "@/components/ProfileForm";
+import ProfileForm from "@/components/features/profile/ProfileForm";
 
 export const metadata = { title: "Profil Pengguna" };
 
