@@ -82,9 +82,10 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
                 <Menu className="w-6 h-6 text-gray-700" strokeWidth={1.5} />
               )}
             </button>
-            <Link href="/" className="flex items-center shrink-0">
-              <span className="font-serif text-[28px] sm:text-[32px] font-bold tracking-tighter text-black hover:text-gray-800 transition-colors">
-                Berita
+            <Link href="/" className="flex items-center shrink-0 group">
+              <span className="font-serif text-[22px] sm:text-[26px] font-bold tracking-tight text-black group-hover:opacity-80 transition-opacity leading-none">
+                <span className="font-normal text-gray-500">Portal</span>
+                <span className="text-black"> Berita</span>
               </span>
             </Link>
             <div className="hidden md:block ml-4 w-64">
@@ -155,10 +156,10 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
             ) : (
               <div className="flex items-center gap-4 sm:gap-6">
                 <Link href="/login" className="hidden sm:block text-[14px] font-normal text-gray-600 hover:text-black transition-colors">
-                  Sign in
+                  Masuk
                 </Link>
                 <Link href="/login" className="bg-black text-white px-4 py-2 rounded-full text-[14px] font-medium hover:bg-gray-800 transition-colors">
-                  Get started
+                  Daftar
                 </Link>
               </div>
             )}
@@ -205,13 +206,13 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
                 ) : (
                   <Link href="/bookmarks" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-[#ebf5fa] hover:text-[#0d88b5] text-gray-700 font-semibold text-[15px] transition-colors group">
                     <Bookmark className="w-5 h-5 text-gray-400 group-hover:text-[#0d88b5]" strokeWidth={2} />
-                    Library
+                    Bookmark
                   </Link>
                 )}
               </>
             ) : (
               <Link href="/login" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl bg-black text-white font-bold text-[15px] transition-shadow hover:shadow-lg mt-2 mx-2">
-                Sign in
+                Masuk ke Portal
               </Link>
             )}
           </div>

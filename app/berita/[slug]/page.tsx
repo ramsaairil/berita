@@ -7,6 +7,8 @@ import { getSession } from "@/lib/session";
 import ArticleInteraction from "@/components/ArticleInteraction";
 import CommentSection from "@/components/CommentSection";
 import { getPopularCategories } from "@/lib/categories";
+import { getCategoryColor } from "@/lib/categoryColors";
+
 
 export default async function ArticlePage({
   params,
@@ -47,8 +49,10 @@ export default async function ArticlePage({
 
   const categories = await getPopularCategories();
 
+  const categoryColor = getCategoryColor(article.category.name);
+
   return (
-    <div className="bg-white dark:bg-[#121212] font-sans min-h-screen transition-colors duration-200">
+    <div className="bg-white font-sans min-h-screen">
       <main className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 py-12 lg:py-16 flex flex-col lg:flex-row gap-16 lg:gap-20">
         
         {/* Minimalist Centered Article Container */}
@@ -58,26 +62,31 @@ export default async function ArticlePage({
             {/* Header & Meta */}
             <header className="mb-10 text-left">
               <div className="mb-6">
-                <Link href={`/category/${article.category.slug}`} className="inline-block text-blue-600 dark:text-blue-400 font-bold uppercase tracking-[0.15em] text-[13px] hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
+                <Link
+                  href={`/category/${article.category.slug}`}
+                  className="inline-block text-[11px] font-black uppercase tracking-[0.18em] hover:opacity-70 transition-opacity"
+                  style={{ color: categoryColor }}
+                >
                   {article.category.name}
                 </Link>
               </div>
               
-              <h1 className="text-[36px] sm:text-[44px] lg:text-[48px] font-black leading-[1.18] tracking-tight mb-8 text-[#111] dark:text-white font-serif">
+              <h1 className="text-[34px] sm:text-[42px] lg:text-[48px] font-bold leading-[1.15] tracking-tight mb-8 text-[#111] font-serif">
                 {article.title}
               </h1>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 sm:gap-5 border-b border-gray-100 dark:border-zinc-800 pb-8 mb-10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 sm:gap-5 border-b border-gray-200 pb-8 mb-10">
                 <img
                   src={article.author.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${article.author.name}`}
                   alt={article.author.name || "Author"}
-                  className="w-12 h-12 rounded-full object-cover shadow-sm ring-1 ring-gray-200 dark:ring-zinc-700"
+                  className="w-11 h-11 rounded-full object-cover ring-1 ring-gray-200"
                 />
                 <div className="text-left">
-                  <div className="font-bold text-[16px] text-gray-900 dark:text-white">{article.author.name}</div>
-                  <div className="text-[14px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">
-                    {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "Baru saja"}
-                    <span className="mx-2 text-gray-300 dark:text-zinc-600">·</span> 5 min read
+                  <div className="font-bold text-[15px] text-gray-900">{article.author.name}</div>
+                  <div className="text-[13px] text-gray-400 mt-0.5">
+                    {article.publishedAt
+                      ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+                      : "Baru saja"}
                   </div>
                 </div>
               </div>
@@ -85,8 +94,8 @@ export default async function ArticlePage({
 
             {/* Framed Feature Image */}
             {article.featuredImg && (
-              <figure className="mb-14">
-                <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] rounded-2xl overflow-hidden bg-gray-50 dark:bg-zinc-900 ring-1 ring-black/5 dark:ring-white/10">
+              <figure className="mb-12">
+                <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] overflow-hidden bg-gray-100">
                   <Image
                     src={article.featuredImg}
                     fill
@@ -96,9 +105,6 @@ export default async function ArticlePage({
                     priority
                   />
                 </div>
-                <figcaption className="text-center text-gray-400 dark:text-gray-500 text-[13px] mt-3.5 font-serif italic px-6">
-                  Ilustrasi visual berita yang berkaitan dengan topik {article.category.name.toLowerCase()}
-                </figcaption>
               </figure>
             )}
 
@@ -113,14 +119,13 @@ export default async function ArticlePage({
               />
             </div>
 
-            {/* Reading Typography Body */}
-            <div className="prose prose-lg sm:prose-xl max-w-none 
-              prose-p:leading-[1.8] prose-p:text-[#282828] dark:prose-p:text-[#e4e4e4] prose-p:font-serif
-              prose-a:text-blue-600 prose-a:decoration-blue-200 hover:prose-a:decoration-blue-600 dark:prose-a:text-blue-400 dark:prose-a:decoration-blue-500/30
-              prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-black dark:prose-headings:text-white prose-headings:font-sans
-              prose-strong:text-black dark:prose-strong:text-white
-              mb-16">
-              
+            {/* Article Body */}
+            <div className="prose prose-lg sm:prose-xl max-w-none
+              prose-p:leading-[1.9] prose-p:text-[#333] prose-p:font-serif
+              prose-a:text-black prose-a:font-bold prose-a:underline prose-a:decoration-2 hover:prose-a:opacity-70
+              prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-black prose-headings:font-serif
+              prose-strong:text-black
+              mb-14">
               <div dangerouslySetInnerHTML={{ __html: article.content }} />
             </div>
 
@@ -149,12 +154,8 @@ export default async function ArticlePage({
           </article>
         </div>
 
-        {/* Sidebar - Stays sticked on the right for large screens */}
-        <div className="w-full lg:w-[35%] xl:w-[30%]">
-           <div className="sticky top-24">
-             <Sidebar categories={categories} />
-           </div>
-        </div>
+        {/* Sidebar */}
+        <Sidebar categories={categories} />
 
       </main>
     </div>

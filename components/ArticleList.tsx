@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
+import { getCategoryColor } from "@/lib/categoryColors";
 
-// Define a type for our matched articles
 type ArticleWithRelations = Prisma.ArticleGetPayload<{
   include: {
     author: true;
@@ -16,57 +16,59 @@ export default function ArticleList({ articles }: { articles: ArticleWithRelatio
   }
 
   return (
-    <>
-      {articles.map((article) => (
-        <article key={article.id} className="flex flex-col sm:flex-row gap-5 group border border-gray-100 rounded-2xl p-4 bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 hover:-translate-y-1 transition-all duration-300">
-          {article.featuredImg && (
-            <Link href={`/berita/${article.slug}`} className="shrink-0 w-full sm:w-[220px] aspect-[4/3] sm:h-[140px] relative rounded-xl overflow-hidden block">
-              <Image
-                src={article.featuredImg}
-                fill
-                sizes="(max-width: 768px) 100vw, 220px"
-                alt={article.title}
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+    <div className="flex flex-col divide-y divide-gray-200">
+      {articles.map((article) => {
+        const categoryColor = getCategoryColor(article.category.name);
+        return (
+          <article key={article.id} className="group py-6 first:pt-0">
+            <Link href={`/berita/${article.slug}`} className="flex gap-5 items-start">
+              {/* Thumbnail */}
+              {article.featuredImg && (
+                <div className="shrink-0 w-[130px] sm:w-[160px] aspect-[4/3] relative overflow-hidden bg-gray-100">
+                  <Image
+                    src={article.featuredImg}
+                    fill
+                    sizes="(max-width: 768px) 130px, 160px"
+                    alt={article.title}
+                    className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                  />
+                </div>
+              )}
+
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-[10px] font-black uppercase tracking-[0.15em] mb-1.5"
+                  style={{ color: categoryColor }}
+                >
+                  {article.category.name}
+                </p>
+                <h2 className="font-serif text-[18px] sm:text-[20px] font-bold leading-tight text-black group-hover:text-[#0d88b5] transition-colors duration-200 mb-2">
+                  {article.title}
+                </h2>
+                {article.excerpt && (
+                  <p className="text-[13px] text-gray-500 leading-relaxed line-clamp-2 mb-2">
+                    {article.excerpt}
+                  </p>
+                )}
+                <div className="flex items-center gap-1.5 text-[12px] text-gray-400">
+                  <span className="font-bold text-gray-600">{article.author.name}</span>
+                  <span>·</span>
+                  <span>
+                    {article.publishedAt
+                      ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "Draft"}
+                  </span>
+                </div>
+              </div>
             </Link>
-          )}
-          <div className="flex-1 flex flex-col py-1">
-            <div className="flex items-center gap-2 mb-2">
-              <img
-                src={article.author.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${article.author.name}`}
-                alt={article.author.name || "Author"}
-                className="rounded-full w-5 h-5 object-cover border border-gray-100"
-              />
-              <span className="text-[13px] font-medium">{article.author.name}</span>
-              <span className="text-gray-400 text-[13px]">·</span>
-              <span className="text-[13px] font-medium text-gray-500">{article.category.name}</span>
-            </div>
-
-            <Link href={`/berita/${article.slug}`} className="block mb-2">
-              <h2 className="text-[18px] sm:text-[20px] font-bold leading-snug group-hover:text-[#0d88b5] transition-colors duration-200 text-[#1a1a1a]">
-                {article.title}
-              </h2>
-            </Link>
-
-            <p className="text-[14px] text-gray-600 leading-relaxed mb-4 line-clamp-2">
-              {article.excerpt}
-            </p>
-
-            <div className="mt-auto flex items-center gap-2 text-[12px] text-gray-500 font-medium">
-              <span>
-                {article.publishedAt
-                  ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric"
-                  })
-                  : "Draft"}
-              </span>
-
-            </div>
-          </div>
-        </article>
-      ))}
-    </>
+          </article>
+        );
+      })}
+    </div>
   );
 }

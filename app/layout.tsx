@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Berita - Portal Berita Modern",
-  description: "Platform portal berita dengan desain minimalis",
+  title: "Portal Berita - Berita Terkini & Terpercaya",
+  description: "Portal berita Indonesia terkini, terpercaya, dan independen. Nasional, Ekonomi, Olahraga, dan Teknologi.",
 };
 
 export default async function RootLayout({
