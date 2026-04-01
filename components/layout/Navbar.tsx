@@ -91,7 +91,7 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
             </button>
             <Link href="/" className="flex items-center shrink-0 group hover:opacity-80 transition-opacity">
               <img
-                src="/logo.png"
+                src="/Logo.png"
                 alt="Portal Berita Logo"
                 className="h-[90px] sm:h-[120px] w-auto max-w-none object-contain -my-10 -ml-2 sm:-ml-5"
               />
