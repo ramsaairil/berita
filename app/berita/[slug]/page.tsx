@@ -9,7 +9,6 @@ import CommentSection from "@/components/features/articles/CommentSection";
 import { getPopularCategories } from "@/lib/categories";
 import { getCategoryColor } from "@/lib/categoryColors";
 
-
 export default async function ArticlePage({
   params,
 }: {
@@ -37,8 +36,16 @@ export default async function ArticlePage({
 
   const session = await getSession();
   const isLoggedIn = !!session;
-  const isLikedByMe = session ? article.likes.some(like => like.userId === session.user.id) : false;
-  const isBookmarkedByMe = session ? article.bookmarks.some(b => b.userId === session.user.id) : false;
+
+  // PERBAIKAN: Menambahkan tipe data eksplisit (like: { userId: string }) 
+  // agar TypeScript tidak memberikan error "implicitly has an any type"
+  const isLikedByMe = session?.user?.id 
+    ? article.likes.some((like: { userId: string }) => like.userId === session.user.id) 
+    : false;
+
+  const isBookmarkedByMe = session?.user?.id 
+    ? article.bookmarks.some((b: { userId: string }) => b.userId === session.user.id) 
+    : false;
 
   const relatedArticles = await prisma.article.findMany({
     where: { categoryId: article.categoryId, id: { not: article.id } },
@@ -48,7 +55,6 @@ export default async function ArticlePage({
   });
 
   const categories = await getPopularCategories();
-
   const categoryColor = getCategoryColor(article.category.name);
 
   return (
@@ -141,7 +147,7 @@ export default async function ArticlePage({
               </div>
             )}
 
-            {/* Comments Area inside the narrow column for focus */}
+            {/* Comments Area */}
             <div className="border-t border-gray-100 dark:border-zinc-800 pt-6">
               <CommentSection
                 articleId={article.id}
