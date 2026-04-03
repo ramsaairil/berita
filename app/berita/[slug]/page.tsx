@@ -39,12 +39,12 @@ export default async function ArticlePage({
 
   // PERBAIKAN: Menambahkan tipe data eksplisit (like: { userId: string }) 
   // agar TypeScript tidak memberikan error "implicitly has an any type"
-  const isLikedByMe = session?.user?.id 
-    ? article.likes.some((like: { userId: string }) => like.userId === session.user.id) 
+  const isLikedByMe = session?.user?.id
+    ? article.likes.some((like: { userId: string }) => like.userId === session.user.id)
     : false;
 
-  const isBookmarkedByMe = session?.user?.id 
-    ? article.bookmarks.some((b: { userId: string }) => b.userId === session.user.id) 
+  const isBookmarkedByMe = session?.user?.id
+    ? article.bookmarks.some((b: { userId: string }) => b.userId === session.user.id)
     : false;
 
   const relatedArticles = await prisma.article.findMany({

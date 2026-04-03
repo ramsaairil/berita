@@ -22,22 +22,23 @@ export default function CategoryBar({ categories }: { categories: Category[] }) 
   return (
     <div id="category-bar" className="w-full -mb-4 relative z-10 transition-all duration-300">
       <div className="max-w-[1336px] mx-auto px-4 sm:px-6">
-        <div className="flex items-center gap-6 overflow-x-auto pt-4 pb-0 no-scrollbar scroll-smooth">
+        <div className="flex items-center gap-3 overflow-x-auto pt-4 pb-0 no-scrollbar scroll-smooth">
           {categories.map((cat) => {
+            const isActive = pathname === `/category/${cat.slug}`;
             const color = getCategoryColor(cat.name);
+            
             return (
               <Link
                 key={cat.id}
                 href={`/category/${cat.slug}`}
-                className="group flex items-center gap-2 shrink-0 transition-opacity hover:opacity-80"
+                className={`px-4 py-1.5 rounded-full text-[13px] font-bold uppercase tracking-wide transition-all duration-300 whitespace-nowrap shrink-0 border ${
+                  isActive 
+                  ? "bg-black text-white border-black shadow-md scale-105" 
+                  : "bg-white text-gray-600 border-gray-100 hover:border-gray-300 hover:text-black hover:bg-gray-50/50 hover:shadow-sm"
+                }`}
+                style={isActive ? { backgroundColor: 'black' } : {}}
               >
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: color }}
-                />
-                <span className="text-[13px] font-bold text-gray-700 uppercase tracking-wide group-hover:text-black transition-colors whitespace-nowrap">
-                  {cat.name}
-                </span>
+                {cat.name}
               </Link>
             );
           })}

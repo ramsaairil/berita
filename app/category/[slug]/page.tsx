@@ -29,7 +29,7 @@ export default async function CategoryPage({
 
   return (
     <div className="bg-white text-black min-h-screen">
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col lg:flex-row gap-12">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-8 sm:pt-8 sm:pb-12 flex flex-col lg:flex-row gap-12">
         {/* Main Content Area */}
         <div className="w-full lg:w-[65%]">
           {/* Category Header — Vox-style */}
