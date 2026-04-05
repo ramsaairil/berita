@@ -18,8 +18,7 @@ export default function RegisterPage() {
       if (result?.error) {
          setError(result.error);
       } else if (result?.success) {
-         router.push("/login?registered=true");
-         router.refresh();
+         router.push("/");
       }
     } catch(err) {
       setError("Terjadi kesalahan dari server.");

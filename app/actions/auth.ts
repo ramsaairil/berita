@@ -30,6 +30,13 @@ export async function registerAction(formData: FormData) {
     }
   });
 
+  await createSession({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    name: user.name || "User",
+  });
+
   return { success: true };
 }
 
