@@ -30,7 +30,14 @@ export default async function WritePage() {
 
     let featuredImg = null;
 
-    if (imageFile && imageFile.size > 0) {
+    if (imageFile && imageFile.size > 0 && imageFile.name !== "undefined") {
+      if (!imageFile.type.startsWith("image/")) {
+        throw new Error("File yang diunggah harus berupa gambar (JPG, PNG, dsb).");
+      }
+      if (imageFile.size > 5 * 1024 * 1024) {
+        throw new Error("Ukuran gambar maksimal adalah 5MB.");
+      }
+
       const bytes = await imageFile.arrayBuffer();
       const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
       const safeFilename = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "-");
