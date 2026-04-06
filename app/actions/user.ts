@@ -30,20 +30,40 @@ export async function updateProfile(formData: FormData) {
      }
 
      const bytes = await imageFile.arrayBuffer();
-     const buffer = Buffer.from(bytes);
-
-     const uploadDir = join(process.cwd(), "public", "uploads");
-     if (!existsSync(uploadDir)) {
-       await mkdir(uploadDir, { recursive: true });
-     }
-
      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
      const safeFilename = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "-");
      const filename = `${uniqueSuffix}-${safeFilename}`;
-     const filePath = join(uploadDir, filename);
 
-     await writeFile(filePath, buffer);
-     imageUrl = `/uploads/${filename}`;
+     if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+       // Upload to Supabase Storage in production / Vercel
+       const { error: uploadError } = await supabase.storage
+         .from("uploads")
+         .upload(`avatars/${filename}`, bytes, {
+           contentType: imageFile.type,
+           upsert: false
+         });
+         
+       if (uploadError) {
+         console.error("Supabase storage error:", uploadError);
+         return { error: "Gagal upload gambar. Pastikan bucket 'uploads' sudah dibuat di Supabase dan diset Public." };
+       }
+       
+       const { data: publicUrlData } = supabase.storage
+         .from("uploads")
+         .getPublicUrl(`avatars/${filename}`);
+         
+       imageUrl = publicUrlData.publicUrl;
+     } else {
+       // Local dev storage fallback
+       const buffer = Buffer.from(bytes);
+       const uploadDir = join(process.cwd(), "public", "uploads");
+       if (!existsSync(uploadDir)) {
+         await mkdir(uploadDir, { recursive: true });
+       }
+       const filePath = join(uploadDir, filename);
+       await writeFile(filePath, buffer);
+       imageUrl = `/uploads/${filename}`;
+     }
   }
 
   const { error } = await supabase

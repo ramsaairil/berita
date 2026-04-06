@@ -32,18 +32,42 @@ export default async function WritePage() {
 
     if (imageFile && imageFile.size > 0) {
       const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      const safeFilename = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "-");
+      const filename = `${uniqueSuffix}-${safeFilename}`;
 
-      const filename = `${Date.now()}-${imageFile.name.replace(/\s+/g, "-")}`;
-      const uploadDir = path.join(process.cwd(), "public", "uploads", "articles");
-      
-      try {
-        await mkdir(uploadDir, { recursive: true });
-      } catch (e) {}
+      if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+        // Upload to Supabase Storage in production / Vercel
+        const { error: uploadError } = await supabase.storage
+          .from("uploads")
+          .upload(`articles/${filename}`, bytes, {
+            contentType: imageFile.type,
+            upsert: false
+          });
+          
+        if (uploadError) {
+          console.error("Supabase storage error:", uploadError);
+          throw new Error("Gagal upload gambar. Pastikan bucket 'uploads' sudah dibuat di Supabase dan diset Public.");
+        }
+        
+        const { data: publicUrlData } = supabase.storage
+          .from("uploads")
+          .getPublicUrl(`articles/${filename}`);
+          
+        featuredImg = publicUrlData.publicUrl;
+      } else {
+        // Local dev storage fallback
+        const buffer = Buffer.from(bytes);
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "articles");
+        
+        try {
+          await mkdir(uploadDir, { recursive: true });
+        } catch (e) {}
 
-      const filePath = path.join(uploadDir, filename);
-      await writeFile(filePath, buffer);
-      featuredImg = `/uploads/articles/${filename}`;
+        const filePath = path.join(uploadDir, filename);
+        await writeFile(filePath, buffer);
+        featuredImg = `/uploads/articles/${filename}`;
+      }
     }
 
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
