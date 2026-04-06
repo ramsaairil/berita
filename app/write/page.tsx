@@ -91,6 +91,7 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
       slug,
       status: "PUBLISHED",
       publishedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       authorId: defaultUser.id,
       categoryId: categoryId,
     });
