@@ -82,7 +82,7 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
 
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
 
-    const { error } = await supabaseAdmin.from("Article").insert({
+    const payload = {
       id: crypto.randomUUID(),
       title,
       content,
@@ -94,7 +94,11 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
       updatedAt: new Date().toISOString(),
       authorId: defaultUser.id,
       categoryId: categoryId,
-    });
+    };
+    
+    console.log("INSERTING ARTICLE PAYLOAD:", payload);
+
+    const { error } = await supabaseAdmin.from("Article").insert(payload);
 
     if (error) {
       console.error("Create article error:", error);
