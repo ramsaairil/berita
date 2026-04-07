@@ -32,10 +32,12 @@ export async function registerAction(formData: FormData) {
     .from("User")
     .insert([
       {
+        id: crypto.randomUUID(),
         name,
         email,
         password: hashedPassword,
-        role: "USER"
+        role: "USER",
+        updatedAt: new Date().toISOString()
       }
     ])
     .select()
