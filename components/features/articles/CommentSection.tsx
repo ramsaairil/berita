@@ -102,8 +102,12 @@ export default function CommentSection({
     startTransition(async () => {
       const res = await addComment(articleId, content);
       if (res?.error) {
-        alert(res.error);
-        router.push("/login");
+        if (res?.authError) {
+          alert(res.error);
+          router.push("/login");
+        } else {
+          alert(res.error);
+        }
       } else {
         setContent("");
       }
@@ -131,7 +135,12 @@ export default function CommentSection({
       startAction(async () => {
          const res = await addComment(articleId, replyContent, c.id);
          if (res?.error) {
-           alert(res.error);
+           if (res?.authError) {
+             alert(res.error);
+             router.push("/login");
+           } else {
+             alert(res.error);
+           }
          } else {
            setIsReplying(false);
            setReplyContent("");
@@ -151,7 +160,12 @@ export default function CommentSection({
       startAction(async () => {
          const res = await toggleCommentLike(c.id);
          if (res?.error) {
-            alert(res.error);
+            if (res?.authError) {
+              alert(res.error);
+              router.push("/login");
+            } else {
+              alert(res.error);
+            }
             setIsLiked(initialIsLiked);
             setLikeCount(initialLikeCount);
          }

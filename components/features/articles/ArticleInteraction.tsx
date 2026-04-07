@@ -37,7 +37,9 @@ export default function ArticleInteraction({
           setLikes(initialLikes);
           setIsLiked(initialIsLiked);
           alert(res.error);
-          router.push("/login");
+          if (res?.authError) {
+            router.push("/login");
+          }
        }
     });
   };
@@ -51,7 +53,9 @@ export default function ArticleInteraction({
       if (res?.error) {
         setIsBookmarked(initialIsBookmarked);
         alert(res.error);
-        router.push("/login");
+        if (res?.authError) {
+          router.push("/login");
+        }
       }
     });
   };

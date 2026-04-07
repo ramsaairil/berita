@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 export async function toggleLike(articleId: string) {
   const session = await getSession();
-  if (!session) return { error: "Silakan login untuk memberikan like." };
+  if (!session) return { error: "Silakan login untuk memberikan like.", authError: true };
 
   const userId = session.user.id;
 
@@ -29,7 +29,7 @@ export async function toggleLike(articleId: string) {
 
 export async function addComment(articleId: string, content: string, parentId?: string) {
   const session = await getSession();
-  if (!session) return { error: "Silakan login untuk berkomentar." };
+  if (!session) return { error: "Silakan login untuk berkomentar.", authError: true };
   
   if (!content.trim()) return { error: "Komentar tidak boleh kosong." };
 
@@ -74,7 +74,7 @@ export async function addComment(articleId: string, content: string, parentId?: 
 
 export async function toggleCommentLike(commentId: string) {
   const session = await getSession();
-  if (!session) return { error: "Silakan login untuk menyukai komentar." };
+  if (!session) return { error: "Silakan login untuk menyukai komentar.", authError: true };
 
   const userId = session.user.id;
 
@@ -125,7 +125,7 @@ export async function toggleCommentLike(commentId: string) {
 
 export async function toggleBookmark(articleId: string) {
   const session = await getSession();
-  if (!session) return { error: "Silakan login untuk menyimpan berita." };
+  if (!session) return { error: "Silakan login untuk menyimpan berita.", authError: true };
 
   const userId = session.user.id;
 
@@ -148,7 +148,7 @@ export async function toggleBookmark(articleId: string) {
 
 export async function deleteComment(commentId: string) {
   const session = await getSession();
-  if (!session) return { error: "Silakan login untuk menghapus komentar." };
+  if (!session) return { error: "Silakan login untuk menghapus komentar.", authError: true };
 
   const { data: comment } = await supabase
     .from("Comment")
