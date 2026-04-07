@@ -34,6 +34,96 @@ async function main() {
     },
   })
 
+  const sportsCategory = await prisma.category.upsert({
+    where: { slug: 'olahraga' },
+    update: {},
+    create: {
+      name: 'Olahraga',
+      slug: 'olahraga',
+      description: 'Berita dan dinamika olahraga nasional maupun internasional terkini.',
+    },
+  })
+
+  const entertainmentCategory = await prisma.category.upsert({
+    where: { slug: 'hiburan' },
+    update: {},
+    create: {
+      name: 'Hiburan',
+      slug: 'hiburan',
+      description: 'Berita dan dinamika hiburan nasional maupun internasional terkini.',
+    },
+  })
+
+  const lifestyleCategory = await prisma.category.upsert({
+    where: { slug: 'gaya-hidup' },
+    update: {},
+    create: {
+      name: 'Gaya Hidup',
+      slug: 'gaya-hidup',
+      description: 'Berita dan dinamika gaya hidup nasional maupun internasional terkini.',
+    },
+  })
+
+  const healthCategory = await prisma.category.upsert({
+    where: { slug: 'kesehatan' },
+    update: {},
+    create: {
+      name: 'Kesehatan',
+      slug: 'kesehatan',
+      description: 'Berita dan dinamika kesehatan nasional maupun internasional terkini.',
+    },
+  })
+
+  const educationCategory = await prisma.category.upsert({
+    where: { slug: 'pendidikan' },
+    update: {},
+    create: {
+      name: 'Pendidikan',
+      slug: 'pendidikan',
+      description: 'Berita dan dinamika pendidikan nasional maupun internasional terkini.',
+    },
+  })
+
+  const travelCategory = await prisma.category.upsert({
+    where: { slug: 'travel' },
+    update: {},
+    create: {
+      name: 'Travel',
+      slug: 'travel',
+      description: 'Berita dan dinamika travel nasional maupun internasional terkini.',
+    },
+  })
+
+  const foodCategory = await prisma.category.upsert({
+    where: { slug: 'kuliner' },
+    update: {},
+    create: {
+      name: 'Kuliner',
+      slug: 'kuliner',
+      description: 'Berita dan dinamika kuliner nasional maupun internasional terkini.',
+    },
+  })
+
+  const automotiveCategory = await prisma.category.upsert({
+    where: { slug: 'otomotif' },
+    update: {},
+    create: {
+      name: 'Otomotif',
+      slug: 'otomotif',
+      description: 'Berita dan dinamika otomotif nasional maupun internasional terkini.',
+    },
+  })
+
+  const financeCategory = await prisma.category.upsert({
+    where: { slug: 'keuangan' },
+    update: {},
+    create: {
+      name: 'Keuangan',
+      slug: 'keuangan',
+      description: 'Berita dan dinamika keuangan nasional maupun internasional terkini.',
+    },
+  })
+
   // 2. Create Tags
   console.log('Creating tags...')
   const aiTag = await prisma.tag.upsert({
