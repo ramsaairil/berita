@@ -11,7 +11,7 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
 
   const { data: categoriesRes } = await supabase.from("Category").select("*");
   const categories = categoriesRes || [];
-  
+
   // Karena belum ada login, kita ambil user ADMIN pertama secara otomatis sebagai penulis
   const { data: defaultUser } = await supabase
     .from("User")
@@ -54,25 +54,25 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
             contentType: imageFile.type,
             upsert: false
           });
-          
+
         if (uploadError) {
           console.error("Supabase storage error:", uploadError);
           redirect("/write?error=" + encodeURIComponent(`Gagal upload gambar ke Supabase: ${uploadError.message}`));
         }
-        
+
         const { data: publicUrlData } = supabase.storage
           .from("uploads")
           .getPublicUrl(`articles/${filename}`);
-          
+
         featuredImg = publicUrlData.publicUrl;
       } else {
         // Local dev storage fallback
         const buffer = Buffer.from(bytes);
         const uploadDir = path.join(process.cwd(), "public", "uploads", "articles");
-        
+
         try {
           await mkdir(uploadDir, { recursive: true });
-        } catch (e) {}
+        } catch (e) { }
 
         const filePath = path.join(uploadDir, filename);
         await writeFile(filePath, buffer);
@@ -95,7 +95,7 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
       authorId: defaultUser.id,
       categoryId: categoryId,
     };
-    
+
     console.log("INSERTING ARTICLE PAYLOAD:", payload);
 
     const { error } = await supabaseAdmin.from("Article").insert(payload);
@@ -123,18 +123,18 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
         )}
 
         <form action={createArticle} className="space-y-4 bg-white dark:bg-zinc-900 p-6 border border-gray-200 dark:border-zinc-800 rounded-3xl shadow-sm">
-          
+
           {/* Row 1: Title + Image side by side */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-5">
             {/* Left: Title, Category, Excerpt */}
             <div className="flex flex-col gap-4">
               <div>
                 <label className="block text-[11px] font-black text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">Judul Artikel</label>
-                <input 
-                  name="title" 
-                  required 
-                  className="w-full bg-gray-50/50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder:text-gray-300" 
-                  placeholder="Masukkan judul berita..." 
+                <input
+                  name="title"
+                  required
+                  className="w-full bg-gray-50/50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder:text-gray-300"
+                  placeholder="Masukkan judul berita..."
                 />
               </div>
 
@@ -149,10 +149,10 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
                 </div>
                 <div>
                   <label className="block text-[11px] font-black text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">Ringkasan</label>
-                  <input 
-                    name="excerpt" 
-                    className="w-full bg-gray-50/50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder:text-gray-300" 
-                    placeholder="Ringkasan singkat..." 
+                  <input
+                    name="excerpt"
+                    className="w-full bg-gray-50/50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white p-3 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all placeholder:text-gray-300"
+                    placeholder="Ringkasan singkat..."
                   />
                 </div>
               </div>
@@ -167,10 +167,10 @@ export default async function WritePage(props: { searchParams: Promise<{ error?:
           {/* Row 2: Content - Full Width */}
           <div>
             <label className="block text-[11px] font-black text-gray-400 dark:text-gray-500 mb-1.5 uppercase tracking-wider">Isi Berita</label>
-            <textarea 
-              name="content" 
-              required 
-              className="w-full bg-gray-50/50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white p-3 rounded-2xl h-[280px] focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y leading-relaxed placeholder:text-gray-300" 
+            <textarea
+              name="content"
+              required
+              className="w-full bg-gray-50/50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white p-3 rounded-2xl h-[280px] focus:ring-2 focus:ring-black dark:focus:ring-white outline-none transition-all resize-y leading-relaxed placeholder:text-gray-300"
               placeholder="Tuliskan berita lengkap..."
             ></textarea>
           </div>

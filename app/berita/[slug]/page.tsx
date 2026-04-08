@@ -195,11 +195,11 @@ export default async function ArticlePage({
                 <div className="max-w-[720px] mx-auto">
                   <div className="flex items-center justify-between mb-8">
                     <h3 className="text-2xl font-bold font-serif text-black tracking-tight">Temukan Lebih Banyak</h3>
-                    <Link 
+                    <Link
                       href={`/`}
                       className="text-sm font-bold text-gray-500 hover:text-black transition-colors flex items-center gap-1 group"
                     >
-                      Lihat Semua 
+                      Lihat Semua
                       <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
@@ -218,4 +218,4 @@ export default async function ArticlePage({
       </main>
     </div>
   );
-}
+}

@@ -77,87 +77,116 @@ export default function NotificationDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-[320px] sm:w-[380px] bg-white border border-gray-100 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-          <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
-            <h3 className="font-bold text-[16px]">Notifikasi</h3>
-            {unreadCount > 0 && (
-              <button 
-                onClick={handleMarkAllRead}
-                className="text-[12px] font-semibold text-[#0d88b5] hover:underline"
-              >
-                Tandai semua dibaca
-              </button>
-            )}
-          </div>
+        <>
+          {/* Backdrop — mobile only */}
+          <div
+            className="fixed inset-0 bg-black/30 z-[99] sm:hidden"
+            onClick={() => setIsOpen(false)}
+          />
 
-          <div className="max-h-[400px] overflow-y-auto">
-            {notifications.length > 0 ? (
-              notifications.map((notif) => (
-                <Link 
-                  key={notif.id}
-                  href={`/berita/${notif.article?.slug}`}
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (!notif.read) markAsRead(notif.id);
-                  }}
-                  className={`flex gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 ${!notif.read ? "bg-blue-50/30" : ""}`}
+          {/* Notification panel */}
+          <div className="
+            fixed inset-x-0 bottom-0 top-auto z-[100] sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2
+            w-full sm:w-[380px]
+            bg-white border-t sm:border border-gray-100
+            rounded-t-2xl sm:rounded-2xl
+            shadow-2xl overflow-hidden
+            animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200
+            sm:origin-top-right
+            max-h-[85vh] sm:max-h-none
+            flex flex-col
+          ">
+            {/* Header */}
+            <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50 shrink-0">
+              <h3 className="font-bold text-[16px]">Notifikasi</h3>
+              <div className="flex items-center gap-3">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-[12px] font-semibold text-[#0d88b5] hover:underline"
+                  >
+                    Tandai semua dibaca
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="sm:hidden text-gray-400 hover:text-black text-[13px] font-bold"
                 >
-                  <div className="shrink-0 relative">
-                    <img 
-                      src={notif.actor.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${notif.actor.name}`} 
-                      className="w-10 h-10 rounded-full object-cover border border-gray-100" 
-                      alt=""
-                    />
-                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white ${notif.type === "LIKE_COMMENT" ? "bg-pink-500" : "bg-blue-500"}`}>
-                      {notif.type === "LIKE_COMMENT" ? (
-                        <Heart className="w-2.5 h-2.5 text-white fill-current" />
-                      ) : (
-                        <MessageSquare className="w-2.5 h-2.5 text-white fill-current" />
-                      )}
+                  Tutup
+                </button>
+              </div>
+            </div>
+
+            {/* Notification list */}
+            <div className="flex-1 overflow-y-auto">
+              {notifications.length > 0 ? (
+                notifications.map((notif) => (
+                  <Link
+                    key={notif.id}
+                    href={`/berita/${notif.article?.slug}`}
+                    onClick={() => {
+                      setIsOpen(false);
+                      if (!notif.read) markAsRead(notif.id);
+                    }}
+                    className={`flex gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 ${!notif.read ? "bg-blue-50/30" : ""}`}
+                  >
+                    <div className="shrink-0 relative">
+                      <img
+                        src={notif.actor.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${notif.actor.name}`}
+                        className="w-10 h-10 rounded-full object-cover border border-gray-100"
+                        alt=""
+                      />
+                      <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white ${notif.type === "LIKE_COMMENT" ? "bg-pink-500" : "bg-blue-500"}`}>
+                        {notif.type === "LIKE_COMMENT" ? (
+                          <Heart className="w-2.5 h-2.5 text-white fill-current" />
+                        ) : (
+                          <MessageSquare className="w-2.5 h-2.5 text-white fill-current" />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] leading-snug">
-                      <span className="font-bold text-black">{notif.actor.name}</span>{" "}
-                      {notif.type === "LIKE_COMMENT" ? (
-                        <span className="text-gray-600">menyukai komentar Anda di</span>
-                      ) : (
-                        <span className="text-gray-600">membalas komentar Anda di</span>
-                      )}{" "}
-                      <span className="font-semibold text-gray-900 line-clamp-1">"{notif.article?.title}"</span>
-                    </p>
-                    <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400">
-                      <Clock className="w-3 h-3" />
-                      {timeAgo(notif.createdAt)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] leading-snug">
+                        <span className="font-bold text-black">{notif.actor.name}</span>{" "}
+                        {notif.type === "LIKE_COMMENT" ? (
+                          <span className="text-gray-600">menyukai komentar Anda di</span>
+                        ) : (
+                          <span className="text-gray-600">membalas komentar Anda di</span>
+                        )}{" "}
+                        <span className="font-semibold text-gray-900 line-clamp-1">"{notif.article?.title}"</span>
+                      </p>
+                      <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400">
+                        <Clock className="w-3 h-3" />
+                        {timeAgo(notif.createdAt)}
+                      </div>
                     </div>
+                    {!notif.read && (
+                      <button
+                        onClick={(e) => handleMarkAsRead(notif.id, e)}
+                        className="shrink-0 w-2 h-2 bg-[#0d88b5] rounded-full mt-2"
+                        title="Tandai dibaca"
+                      />
+                    )}
+                  </Link>
+                ))
+              ) : (
+                <div className="p-12 text-center">
+                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Bell className="w-8 h-8 text-gray-300" />
                   </div>
-                  {!notif.read && (
-                    <button 
-                      onClick={(e) => handleMarkAsRead(notif.id, e)}
-                      className="shrink-0 w-2 h-2 bg-[#0d88b5] rounded-full mt-2"
-                      title="Tandai dibaca"
-                    />
-                  )}
-                </Link>
-              ))
-            ) : (
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Bell className="w-8 h-8 text-gray-300" />
+                  <p className="text-gray-500 text-[14px]">Belum ada notifikasi.</p>
                 </div>
-                <p className="text-gray-500 text-[14px]">Belum ada notifikasi.</p>
+              )}
+            </div>
+
+            {notifications.length > 0 && (
+              <div className="p-3 bg-gray-50/50 text-center border-t border-gray-100 shrink-0">
+                <button className="text-[12px] font-bold text-gray-500 hover:text-black">
+                  Lihat Semua Notifikasi
+                </button>
               </div>
             )}
           </div>
-
-          {notifications.length > 0 && (
-            <div className="p-3 bg-gray-50/50 text-center border-t border-gray-100">
-              <button className="text-[12px] font-bold text-gray-500 hover:text-black">
-                Lihat Semua Notifikasi
-              </button>
-            </div>
-          )}
-        </div>
+        </>
       )}
     </div>
   );
