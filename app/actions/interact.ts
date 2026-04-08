@@ -20,7 +20,11 @@ export async function toggleLike(articleId: string) {
   if (existingLike) {
     await supabaseAdmin.from("Like").delete().eq("id", existingLike.id);
   } else {
-    await supabaseAdmin.from("Like").insert({ userId, articleId });
+    await supabaseAdmin.from("Like").insert({ 
+      id: crypto.randomUUID(),
+      userId, 
+      articleId 
+    });
   }
 
   revalidatePath(`/berita/[slug]`, "page");
@@ -36,10 +40,12 @@ export async function addComment(articleId: string, content: string, parentId?: 
   const { data: comment, error: createError } = await supabaseAdmin
     .from("Comment")
     .insert({
+      id: crypto.randomUUID(),
       content,
       articleId,
       authorId: session.user.id,
-      parentId: parentId || null
+      parentId: parentId || null,
+      updatedAt: new Date().toISOString()
     })
     .select()
     .single();
@@ -59,6 +65,7 @@ export async function addComment(articleId: string, content: string, parentId?: 
 
     if (parentComment && parentComment.authorId !== session.user.id) {
       await supabaseAdmin.from("Notification").insert({
+        id: crypto.randomUUID(),
         type: "REPLY_COMMENT",
         userId: parentComment.authorId,
         actorId: session.user.id,
@@ -90,7 +97,11 @@ export async function toggleCommentLike(commentId: string) {
   } else {
     const { data: like, error } = await supabaseAdmin
       .from("CommentLike")
-      .insert({ userId, commentId })
+      .insert({ 
+        id: crypto.randomUUID(),
+        userId, 
+        commentId 
+      })
       .select(`
         *,
         Comment (
@@ -110,6 +121,7 @@ export async function toggleCommentLike(commentId: string) {
     // Trigger Notification for Like
     if (comment.authorId !== userId) {
       await supabaseAdmin.from("Notification").insert({
+        id: crypto.randomUUID(),
         type: "LIKE_COMMENT",
         userId: comment.authorId,
         actorId: userId,
@@ -139,7 +151,11 @@ export async function toggleBookmark(articleId: string) {
   if (existingBookmark) {
     await supabaseAdmin.from("Bookmark").delete().eq("id", existingBookmark.id);
   } else {
-    await supabaseAdmin.from("Bookmark").insert({ userId, articleId });
+    await supabaseAdmin.from("Bookmark").insert({ 
+      id: crypto.randomUUID(),
+      userId, 
+      articleId 
+    });
   }
 
   revalidatePath("/bookmarks");
