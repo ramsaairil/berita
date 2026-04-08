@@ -176,12 +176,6 @@ export default async function ArticlePage({
             <div className="prose prose-lg sm:prose-xl max-w-none
               prose-p:leading-[1.8] prose-p:text-[#292929] prose-p:font-serif
               prose-p:mb-8
-              prose-p:first-of-type:first-letter:text-7xl 
-              prose-p:first-of-type:first-letter:font-bold 
-              prose-p:first-of-type:first-letter:float-left 
-              prose-p:first-of-type:first-letter:mr-3 
-              prose-p:first-of-type:first-letter:mt-1
-              prose-p:first-of-type:first-letter:text-black
               prose-li:text-[#292929] prose-li:font-serif
               prose-h1:text-3xl prose-h1:font-bold prose-h1:font-serif prose-h1:mb-6
               prose-h2:text-2xl prose-h2:font-bold prose-h2:font-serif prose-h2:mb-4
