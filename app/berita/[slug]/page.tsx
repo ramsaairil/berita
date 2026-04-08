@@ -13,8 +13,8 @@ import { getCategoryColor } from "@/lib/categoryColors";
 /** Mengkonversi plain text jadi HTML paragraf secara otomatis */
 function formatArticleContent(content: string): string {
   if (!content) return '';
-  // Jika teks sudah memiliki format tag HTML, biarkan.
-  if (/<[a-z][\s\S]*>/i.test(content)) return content;
+  // Jika teks memiliki format tag HTML (dari Rich Text Editor), biarkan.
+  if (/<(p|h1|h2|h3|ul|ol|li|blockquote|strong|em|u|s|a)[\s\S]*>/i.test(content)) return content;
   
   // Jika berupa teks biasa (plain text), pecah berdasarkan DOUBLE ENTER (paragraf)
   // dan bungkus setiap paragraf dengan <p> agar stylenya rapih
@@ -182,6 +182,9 @@ export default async function ArticlePage({
               prose-p:first-of-type:first-letter:mr-3 
               prose-p:first-of-type:first-letter:mt-1
               prose-p:first-of-type:first-letter:text-black
+              prose-li:text-[#292929] prose-li:font-serif
+              prose-h1:text-3xl prose-h1:font-bold prose-h1:font-serif prose-h1:mb-6
+              prose-h2:text-2xl prose-h2:font-bold prose-h2:font-serif prose-h2:mb-4
               prose-a:text-black prose-a:font-bold prose-a:underline prose-a:decoration-1 hover:prose-a:opacity-70
               prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-black prose-headings:font-serif
               prose-strong:text-black
