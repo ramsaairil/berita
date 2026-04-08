@@ -85,13 +85,13 @@ export default function NotificationDropdown() {
           />
 
           <div className="
-            absolute -right-2 sm:right-0 mt-3 sm:mt-2
-            w-[290px] sm:w-[380px]
+            fixed top-[65px] left-4 right-4 w-auto
+            sm:absolute sm:top-auto sm:bottom-auto sm:left-auto sm:right-0 sm:mt-2 sm:w-[380px]
             bg-white border border-gray-100
             rounded-2xl
             shadow-2xl overflow-hidden
             animate-in fade-in zoom-in-95 duration-200
-            origin-top-right
+            origin-top sm:origin-top-right
             z-[100]
             flex flex-col
           ">
