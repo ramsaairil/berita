@@ -114,6 +114,56 @@ async function main() {
     },
   })
 
+  const nationalCategory = await prisma.category.upsert({
+    where: { slug: 'nasional' },
+    update: {},
+    create: {
+      name: 'Nasional',
+      slug: 'nasional',
+      description: 'Berita terkini dari seluruh wilayah Indonesia.',
+    },
+  })
+
+  const internationalCategory = await prisma.category.upsert({
+    where: { slug: 'internasional' },
+    update: {},
+    create: {
+      name: 'Internasional',
+      slug: 'internasional',
+      description: 'Kabar terbaru dari mancanegara dan isu global.',
+    },
+  })
+
+  const economyCategory = await prisma.category.upsert({
+    where: { slug: 'ekonomi' },
+    update: {},
+    create: {
+      name: 'Ekonomi',
+      slug: 'ekonomi',
+      description: 'Berita bisnis, pasar saham, dan perkembangan ekonomi.',
+    },
+  })
+
+  const crimeCategory = await prisma.category.upsert({
+    where: { slug: 'kriminal' },
+    update: {},
+    create: {
+      name: 'Kriminal',
+      slug: 'kriminal',
+      description: 'Laporan peristiwa hukum dan keamanan masyarakat.',
+    },
+  })
+
+  const scienceCategory = await prisma.category.upsert({
+    where: { slug: 'sains' },
+    update: {},
+    create: {
+      name: 'Sains',
+      slug: 'sains',
+      description: 'Penemuan ilmiah dan perkembangan ilmu pengetahuan.',
+    },
+  })
+
   const financeCategory = await prisma.category.upsert({
     where: { slug: 'keuangan' },
     update: {},
