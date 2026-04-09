@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import { supabase, supabaseAdmin } from "@/lib/supabase";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { writeFile, mkdir } from "fs/promises";
@@ -18,7 +18,7 @@ export async function updateProfile(formData: FormData) {
     return { error: "Nama tidak boleh kosong." };
   }
 
-  let imageUrl = undefined;
+  let imageUrl: string | undefined = undefined;
 
   // Process File Upload if it exists and is populated
   if (imageFile && imageFile.size > 0 && imageFile.name !== "undefined") {
@@ -30,29 +30,54 @@ export async function updateProfile(formData: FormData) {
      }
 
      const bytes = await imageFile.arrayBuffer();
-     const buffer = Buffer.from(bytes);
-
-     const uploadDir = join(process.cwd(), "public", "uploads");
-     if (!existsSync(uploadDir)) {
-       await mkdir(uploadDir, { recursive: true });
-     }
-
      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
      const safeFilename = imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "-");
      const filename = `${uniqueSuffix}-${safeFilename}`;
-     const filePath = join(uploadDir, filename);
 
-     await writeFile(filePath, buffer);
-     imageUrl = `/uploads/${filename}`;
+     if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+       // Upload to Supabase Storage in production / Vercel
+       const { error: uploadError } = await supabaseAdmin.storage
+         .from("uploads")
+         .upload(`avatars/${filename}`, bytes, {
+           contentType: imageFile.type,
+           upsert: false
+         });
+         
+       if (uploadError) {
+         console.error("Supabase storage error:", uploadError);
+         return { error: "Gagal upload gambar. Hubungi administrator." };
+       }
+       
+       const { data: publicUrlData } = supabase.storage
+         .from("uploads")
+         .getPublicUrl(`avatars/${filename}`);
+         
+       imageUrl = publicUrlData.publicUrl;
+     } else {
+       // Local dev storage fallback
+       const buffer = Buffer.from(bytes);
+       const uploadDir = join(process.cwd(), "public", "uploads");
+       if (!existsSync(uploadDir)) {
+         await mkdir(uploadDir, { recursive: true });
+       }
+       const filePath = join(uploadDir, filename);
+       await writeFile(filePath, buffer);
+       imageUrl = `/uploads/${filename}`;
+     }
   }
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: {
+  const { error } = await supabaseAdmin
+    .from("User")
+    .update({
       name: name.trim(),
       ...(imageUrl !== undefined && { image: imageUrl })
-    }
-  });
+    })
+    .eq("id", session.user.id);
+
+  if (error) {
+    console.error("Profile update error:", error);
+    return { error: "Gagal memperbarui profil." };
+  }
 
   // Revalidate layout and currently active pages where avatar may appear
   revalidatePath("/", "layout");

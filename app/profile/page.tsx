@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
-import ProfileForm from "@/components/ProfileForm";
+import { supabase } from "@/lib/supabase";
+import ProfileForm from "@/components/features/profile/ProfileForm";
 
 export const metadata = { title: "Profil Pengguna" };
 
@@ -11,11 +11,13 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id }
-  });
+  const { data: user, error } = await supabase
+    .from("User")
+    .select("*")
+    .eq("id", session.user.id)
+    .maybeSingle();
   
-  if (!user) {
+  if (error || !user) {
     redirect("/login");
   }
 

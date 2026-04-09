@@ -4,7 +4,7 @@ import { useState, useTransition, useMemo } from "react";
 import { addComment, toggleCommentLike, deleteComment } from "@/app/actions/interact";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ThumbsUp, Trash2 } from "lucide-react";
+import { ThumbsUp, Trash2, CornerDownRight } from "lucide-react";
 import Image from "next/image";
 
 type CommentType = {
@@ -102,8 +102,12 @@ export default function CommentSection({
     startTransition(async () => {
       const res = await addComment(articleId, content);
       if (res?.error) {
-        alert(res.error);
-        router.push("/login");
+        if (res?.authError) {
+          alert(res.error);
+          router.push("/login");
+        } else {
+          alert(res.error);
+        }
       } else {
         setContent("");
       }
@@ -131,7 +135,12 @@ export default function CommentSection({
       startAction(async () => {
          const res = await addComment(articleId, replyContent, c.id);
          if (res?.error) {
-           alert(res.error);
+           if (res?.authError) {
+             alert(res.error);
+             router.push("/login");
+           } else {
+             alert(res.error);
+           }
          } else {
            setIsReplying(false);
            setReplyContent("");
@@ -151,7 +160,12 @@ export default function CommentSection({
       startAction(async () => {
          const res = await toggleCommentLike(c.id);
          if (res?.error) {
-            alert(res.error);
+            if (res?.authError) {
+              alert(res.error);
+              router.push("/login");
+            } else {
+              alert(res.error);
+            }
             setIsLiked(initialIsLiked);
             setLikeCount(initialLikeCount);
          }
@@ -181,8 +195,9 @@ export default function CommentSection({
              <h4 className="font-bold text-[15px]">{c.author.name}</h4>
              
              {!isRoot && !c.isDirectReplyToRoot && c.replyToName && (
-               <span className="text-gray-500 text-[13px] flex items-center gap-1 font-medium bg-gray-50 px-2 py-0.5 rounded-md">
-                 ▶ {c.replyToName}
+               <span className="text-gray-500 text-[13px] flex items-center gap-1 font-medium hover:text-black transition-colors" style={{ marginLeft: '-2px' }}>
+                 <CornerDownRight className="w-3.5 h-3.5 text-gray-400" />
+                 {c.replyToName}
                </span>
              )}
 
@@ -268,7 +283,7 @@ export default function CommentSection({
   };
 
   return (
-    <div id="comments" className="mt-16 border-t border-gray-100 pt-10">
+    <div id="comments" className="mt-8 pt-0">
       <h3 className="text-2xl font-bold mb-8">Komentar ({totalCommentCount})</h3>
 
       {isLoggedIn ? (
@@ -302,9 +317,7 @@ export default function CommentSection({
             <SingleComment key={c.id} c={c} />
           ))}
         </div>
-      ) : (
-        <p className="text-gray-500 text-center py-10 bg-gray-50 rounded-xl border border-gray-100">Jadilah yang pertama memberikan pendapat untuk artikel ini.</p>
-      )}
+      ) : null}
     </div>
   );
 }

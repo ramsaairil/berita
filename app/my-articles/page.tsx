@@ -1,29 +1,36 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
-import prisma from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle, Eye, PenSquare, Calendar } from "lucide-react";
-import DeleteArticleButton from "@/components/DeleteArticleButton";
+import DeleteArticleButton from "@/components/ui/DeleteArticleButton";
 
 export default async function MyArticlesPage() {
   const session = await getSession();
   if (!session) redirect("/login");
   if (session.user.role !== "ADMIN") redirect("/");
 
-  const articles = await prisma.article.findMany({
-    where: { authorId: session.user.id },
-    include: {
-      category: true,
-      _count: {
-        select: {
-          likes: true,
-          comments: true,
-        },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const { data: articles, error } = await supabase
+    .from("Article")
+    .select(`
+      *,
+      category:Category (
+        name
+      ),
+      likes:Like (count),
+      comments:Comment (count)
+    `)
+    .eq("authorId", session.user.id)
+    .order("createdAt", { ascending: false });
+
+  const processedArticles = (articles || []).map((a: any) => ({
+    ...a,
+    _count: {
+      likes: a.likes[0]?.count || 0,
+      comments: a.comments[0]?.count || 0,
+    }
+  }));
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
@@ -34,40 +41,42 @@ export default async function MyArticlesPage() {
             Artikel Saya
           </h1>
           <p className="text-gray-500 text-[15px] mt-1">
-            {articles.length} berita telah diterbitkan
+            {processedArticles.length} berita telah diterbitkan
           </p>
         </div>
-        <Link
-          href="/write"
-          className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-[14px] font-bold hover:bg-gray-800 transition-all hover:shadow-lg"
-        >
-          <PenSquare className="w-4 h-4" />
-          <span className="hidden sm:inline">Tulis Berita</span>
-        </Link>
+        {processedArticles.length > 0 && (
+          <Link
+            href="/write"
+            className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-[14px] font-bold hover:bg-gray-800 transition-all hover:shadow-lg"
+          >
+            <PenSquare className="w-4 h-4" />
+            <span className="hidden sm:inline">Tulis Berita</span>
+          </Link>
+        )}
       </div>
 
       {/* Stats Summary */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
-          <p className="text-[28px] font-bold text-black">{articles.length}</p>
+          <p className="text-[28px] font-bold text-black">{processedArticles.length}</p>
           <p className="text-[13px] text-gray-500 font-medium mt-1">Berita</p>
         </div>
         <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
           <p className="text-[28px] font-bold text-[#e11d48]">
-            {articles.reduce((sum, a) => sum + a._count.likes, 0)}
+            {processedArticles.reduce((sum, a) => sum + a._count.likes, 0)}
           </p>
           <p className="text-[13px] text-gray-500 font-medium mt-1">Total Like</p>
         </div>
         <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm text-center">
           <p className="text-[28px] font-bold text-[#0d88b5]">
-            {articles.reduce((sum, a) => sum + a._count.comments, 0)}
+            {processedArticles.reduce((sum, a) => sum + a._count.comments, 0)}
           </p>
           <p className="text-[13px] text-gray-500 font-medium mt-1">Total Komentar</p>
         </div>
       </div>
 
       {/* Articles List */}
-      {articles.length === 0 ? (
+      {processedArticles.length === 0 ? (
         <div className="bg-white rounded-3xl border border-gray-100 p-16 text-center shadow-sm">
           <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <PenSquare className="w-8 h-8 text-gray-300" />
@@ -83,7 +92,7 @@ export default async function MyArticlesPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {articles.map((article) => (
+          {processedArticles.map((article) => (
             <div
               key={article.id}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-300 overflow-hidden"
@@ -124,10 +133,10 @@ export default async function MyArticlesPage() {
                       <Calendar className="w-3 h-3" />
                       {article.publishedAt
                         ? new Date(article.publishedAt).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
                         : "Draft"}
                     </div>
                   </div>

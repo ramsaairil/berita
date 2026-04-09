@@ -52,11 +52,11 @@ export default function LoginPage() {
         <form action={clientAction} className="space-y-6">
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
-            <input type="email" name="email" required className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black transition-colors" placeholder="nama@email.com" />
+            <input type="email" name="email" required className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black transition-colors" placeholder="Masukkan email" />
           </div>
           <div className="pb-4">
             <label className="block text-sm font-medium mb-1">Kata Sandi</label>
-            <input type="password" name="password" required className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black transition-colors" placeholder="••••••••" />
+            <input type="password" name="password" required className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black transition-colors" placeholder="Masukkan kata sandi" />
           </div>
           
           <button type="submit" disabled={pending} className="w-full bg-black text-white py-3 rounded-full font-medium hover:bg-gray-900 transition-colors disabled:opacity-50">

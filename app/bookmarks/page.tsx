@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/session";
-import prisma from "@/lib/prisma";
-import ArticleList from "@/components/ArticleList";
+import { supabase } from "@/lib/supabase";
+import ArticleList from "@/components/features/articles/ArticleList";
 import { redirect } from "next/navigation";
 
 export default async function BookmarksPage() {
@@ -10,23 +10,30 @@ export default async function BookmarksPage() {
     redirect("/login");
   }
 
-  const bookmarks = await prisma.bookmark.findMany({
-    where: { userId: session.user.id },
-    include: {
-      article: {
-        include: {
-          author: true,
-          category: true,
-        }
-      }
-    },
-    orderBy: { createdAt: "desc" }
-  });
+  const { data: bookmarks, error } = await supabase
+    .from("Bookmark")
+    .select(`
+      article:Article (
+        *,
+        author:User (
+          id,
+          name,
+          image
+        ),
+        category:Category (
+          id,
+          name,
+          slug
+        )
+      )
+    `)
+    .eq("userId", session.user.id)
+    .order("createdAt", { ascending: false });
 
-  const articles = bookmarks.map(b => b.article);
+  const articles = (bookmarks || []).map((b: any) => b.article).filter(Boolean);
 
   return (
-    <div className="bg-[#ebf5fa] min-h-screen font-sans">
+    <div className="bg-white min-h-screen font-sans">
       <main className="max-w-5xl mx-auto px-6 py-12">
         <header className="mb-10">
           <h1 className="text-[32px] sm:text-[40px] font-bold tracking-tight text-[#1a1a1a]">

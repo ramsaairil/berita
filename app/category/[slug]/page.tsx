@@ -1,16 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
-import ArticleList from "@/components/ArticleList";
-import Sidebar from "@/components/Sidebar";
+import ArticleList from "@/components/features/articles/ArticleList";
+import Sidebar from "@/components/layout/Sidebar";
 import { notFound } from "next/navigation";
-
-const connectionString = process.env.DATABASE_URL;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool as any);
-const prisma = new PrismaClient({ adapter });
-
 import { getPopularCategories } from "@/lib/categories";
+import { getCategoryColor } from "@/lib/categoryColors";
+import { getCategoryBySlug, getArticlesByCategory } from "@/lib/articles";
 
 export default async function CategoryPage({
   params,
@@ -19,49 +12,46 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params;
 
-  const category = await prisma.category.findUnique({
-    where: { slug: slug },
-  });
+  const category = await getCategoryBySlug(slug);
 
-  if (!category) {
-    notFound();
-  }
+  if (!category) notFound();
 
-  const articles = await prisma.article.findMany({
-    where: {
-      categoryId: category.id,
-    },
-    include: {
-      author: true,
-      category: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const articles = await getArticlesByCategory(category.id);
 
   const categories = await getPopularCategories();
+  const categoryColor = getCategoryColor(category.name);
 
   return (
-    <div className="flex bg-white font-sans text-black">
-      <main className="flex-1 w-full max-w-7xl mx-auto px-6 py-10 flex gap-12">
+    <div className="bg-white text-black min-h-screen">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-6 pb-8 sm:pt-8 sm:pb-12 flex flex-col lg:flex-row gap-12">
         {/* Main Content Area */}
         <div className="w-full lg:w-[65%]">
-          <div className="mb-8 border-b border-gray-100 pb-8">
-             <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-xl font-serif">
-                    #
-                 </div>
-                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
-                    <p className="text-gray-500 mt-1">Topic · {articles.length} Articles</p>
-                 </div>
-             </div>
-          </div>
-          <div className="flex flex-col gap-12">
-            <ArticleList articles={articles as any} />
-          </div>
+          {/* Category Header — Vox-style */}
+          <header className="mb-6">
+            <p
+              className="text-[11px] font-black uppercase tracking-[0.2em] mb-3"
+              style={{ color: categoryColor }}
+            >
+              Kategori
+            </p>
+            <h1 className="font-serif text-[36px] sm:text-[48px] font-bold leading-tight text-black">
+              {category.name}
+            </h1>
+            {category.description && (
+              <p className="text-[16px] text-gray-500 mt-3 leading-relaxed">
+                {category.description}
+              </p>
+            )}
+            <p className="text-[13px] text-gray-400 mt-2 font-semibold">
+              {articles?.length || 0} artikel
+            </p>
+          </header>
+
+          {/* Article List */}
+          <ArticleList articles={(articles || []) as any} />
         </div>
+
+        {/* Sidebar */}
         <Sidebar categories={categories} />
       </main>
     </div>

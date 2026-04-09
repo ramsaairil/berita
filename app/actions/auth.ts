@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { createSession, deleteSession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import prisma from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 export async function registerAction(formData: FormData) {
   const name = formData.get("name") as string;
@@ -14,20 +14,45 @@ export async function registerAction(formData: FormData) {
     return { error: "Semua field wajib diisi!" };
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  // Check if email already exists
+  const { data: existing } = await supabase
+    .from("User")
+    .select("id")
+    .eq("email", email)
+    .single();
+
   if (existing) {
     return { error: "Email sudah terdaftar!" };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
   
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      role: "USER"
-    }
+  // Create user in Supabase
+  const { data: user, error: createError } = await supabase
+    .from("User")
+    .insert([
+      {
+        id: crypto.randomUUID(),
+        name,
+        email,
+        password: hashedPassword,
+        role: "USER",
+        updatedAt: new Date().toISOString()
+      }
+    ])
+    .select()
+    .single();
+
+  if (createError || !user) {
+    console.error("Register Error:", createError);
+    return { error: "Gagal mendaftarkan akun." };
+  }
+
+  await createSession({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    name: user.name || "User",
   });
 
   return { success: true };
@@ -41,8 +66,13 @@ export async function loginAction(formData: FormData) {
     return { error: "Email dan Password wajib diisi!" };
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !user.password) {
+  const { data: user, error: findError } = await supabase
+    .from("User")
+    .select("*")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (findError || !user || !user.password) {
     return { error: "Email tidak ditemukan atau kredensial salah!" };
   }
 

@@ -10,13 +10,15 @@ export default function ArticleInteraction({
   initialLikes,
   initialIsLiked,
   initialIsBookmarked,
-  commentCount
+  commentCount,
+  hideShareAndSave = false
 }: {
   articleId: string;
   initialLikes: number;
   initialIsLiked: boolean;
   initialIsBookmarked: boolean;
   commentCount: number;
+  hideShareAndSave?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [likes, setLikes] = useState(initialLikes);
@@ -35,7 +37,9 @@ export default function ArticleInteraction({
           setLikes(initialLikes);
           setIsLiked(initialIsLiked);
           alert(res.error);
-          router.push("/login");
+          if (res?.authError) {
+            router.push("/login");
+          }
        }
     });
   };
@@ -49,7 +53,9 @@ export default function ArticleInteraction({
       if (res?.error) {
         setIsBookmarked(initialIsBookmarked);
         alert(res.error);
-        router.push("/login");
+        if (res?.authError) {
+          router.push("/login");
+        }
       }
     });
   };
@@ -67,26 +73,28 @@ export default function ArticleInteraction({
             <MessageSquare className="w-5 h-5" strokeWidth={1.5} /> {commentCount}
          </button>
       </div>
-      <div className="flex items-center gap-4 text-gray-500">
-         <button 
-           onClick={() => {
-             navigator.clipboard.writeText(window.location.href);
-             alert("Tautan berhasil disalin!");
-           }}
-           className="hover:text-black p-2 rounded-full hover:bg-gray-50 transition-all" 
-           title="Salin Tautan"
-         >
-           <LinkIcon className="w-5 h-5" strokeWidth={1.5} />
-         </button>
-         <button 
-           onClick={handleBookmark} 
-           disabled={isPending}
-           className={`p-2 rounded-full hover:bg-gray-50 transition-all ${isBookmarked ? 'text-[#0d88b5]' : 'hover:text-black'}`}
-           title={isBookmarked ? "Hapus Simpanan" : "Simpan Berita"}
-         >
-           <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-[#0d88b5]' : ''}`} strokeWidth={1.5} />
-         </button>
-      </div>
+      {!hideShareAndSave && (
+        <div className="flex items-center gap-4 text-gray-500">
+           <button 
+             onClick={() => {
+               navigator.clipboard.writeText(window.location.href);
+               alert("Tautan berhasil disalin!");
+             }}
+             className="hover:text-black p-2 rounded-full hover:bg-gray-50 transition-all" 
+             title="Salin Tautan"
+           >
+             <LinkIcon className="w-5 h-5" strokeWidth={1.5} />
+           </button>
+           <button 
+             onClick={handleBookmark} 
+             disabled={isPending}
+             className={`p-2 rounded-full hover:bg-gray-50 transition-all ${isBookmarked ? 'text-[#0d88b5]' : 'hover:text-black'}`}
+             title={isBookmarked ? "Hapus Simpanan" : "Simpan Berita"}
+           >
+             <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-[#0d88b5]' : ''}`} strokeWidth={1.5} />
+           </button>
+        </div>
+      )}
     </div>
   );
 }

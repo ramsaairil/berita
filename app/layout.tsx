@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/layout/Navbar";
 import { getSession } from "@/lib/session";
-import prisma from "@/lib/prisma";
-import Footer from "@/components/Footer";
+import { supabase } from "@/lib/supabase";
+import Footer from "@/components/layout/Footer";
+import CategoryBar from "@/components/layout/CategoryBar";
 import { getPopularCategories } from "@/lib/categories";
 
 const geistSans = Geist({
@@ -18,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Berita - Portal Berita Modern",
-  description: "Platform portal berita dengan desain minimalis",
+  title: "Portal Berita - Berita Terkini & Terpercaya",
+  description: "Portal berita Indonesia terkini, terpercaya, dan independen. Nasional, Ekonomi, Olahraga, dan Teknologi.",
 };
 
 export default async function RootLayout({
@@ -30,20 +31,26 @@ export default async function RootLayout({
   const session = await getSession();
   let dbUser = null;
 
-  if (session) {
-    dbUser = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (session?.user?.id) {
+    const { data } = await supabase
+      .from("User")
+      .select("*")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    dbUser = data;
   }
 
   const categories = await getPopularCategories();
 
   return (
     <html lang="id">
-      <body className="antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+      <body className="antialiased min-h-screen flex flex-col relative">
         <Navbar user={dbUser} categories={categories as any} />
-        <div className="flex-1 basis-auto">
+        <CategoryBar categories={categories as any} />
+        <main id="main-content" className="flex flex-col flex-1 basis-auto w-full transition-all duration-300">
           {children}
-        </div>
-        <Footer />
+          <Footer />
+        </main>
       </body>
     </html>
   );
