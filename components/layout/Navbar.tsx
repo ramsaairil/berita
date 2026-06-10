@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Search, PenSquare, LogOut, User, Bookmark, X, Newspaper, Home, TrendingUp } from "lucide-react";
+import { Menu, Search, PenSquare, LogOut, User, Bookmark, X, Newspaper, Home, TrendingUp, Shield } from "lucide-react";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 import { usePathname } from "next/navigation";
@@ -138,10 +138,16 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
                         Profile
                       </Link>
                       {isAdmin ? (
-                        <Link href="/my-articles" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:text-black hover:bg-gray-50 transition-colors">
-                          <Newspaper className="w-4 h-4 text-gray-500" />
-                          Artikel
-                        </Link>
+                        <>
+                          <Link href="/my-articles" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:text-black hover:bg-gray-50 transition-colors">
+                            <Newspaper className="w-4 h-4 text-gray-500" />
+                            Artikel
+                          </Link>
+                          <Link href="/admin/users" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:text-black hover:bg-gray-50 transition-colors">
+                            <Shield className="w-4 h-4 text-gray-500" />
+                            Admin Dashboard
+                          </Link>
+                        </>
                       ) : (
                         <Link href="/bookmarks" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-[14px] text-gray-700 hover:text-black hover:bg-gray-50 transition-colors">
                           <Bookmark className="w-4 h-4 text-gray-500" />
@@ -213,10 +219,16 @@ export default function Navbar({ user, categories }: { user?: any, categories?: 
                   Profile
                 </Link>
                 {isAdmin ? (
-                  <Link href="/my-articles" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-[#ebf5fa] hover:text-[#0d88b5] text-gray-700 font-semibold text-[15px] transition-colors group">
-                    <Newspaper className="w-5 h-5 text-gray-400 group-hover:text-[#0d88b5]" strokeWidth={2} />
-                    Artikel Saya
-                  </Link>
+                  <>
+                    <Link href="/my-articles" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-[#ebf5fa] hover:text-[#0d88b5] text-gray-700 font-semibold text-[15px] transition-colors group">
+                      <Newspaper className="w-5 h-5 text-gray-400 group-hover:text-[#0d88b5]" strokeWidth={2} />
+                      Artikel Saya
+                    </Link>
+                    <Link href="/admin/users" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-[#ebf5fa] hover:text-[#0d88b5] text-gray-700 font-semibold text-[15px] transition-colors group">
+                      <Shield className="w-5 h-5 text-gray-400 group-hover:text-[#0d88b5]" strokeWidth={2} />
+                      Admin Dashboard
+                    </Link>
+                  </>
                 ) : (
                   <Link href="/bookmarks" onClick={() => setIsSidebarOpen(false)} className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl hover:bg-[#ebf5fa] hover:text-[#0d88b5] text-gray-700 font-semibold text-[15px] transition-colors group">
                     <Bookmark className="w-5 h-5 text-gray-400 group-hover:text-[#0d88b5]" strokeWidth={2} />
